@@ -5,4 +5,7 @@ urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
     path('teachers/', TeacherPageView.as_view(), name='teachers'),
     path('students/', StudentPageView.as_view(), name='students'),
+
+    path('login/', login, name='login'),
+    path('logout/', logout, name='logout'),
 ] 
