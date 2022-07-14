@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .config import Mounth, Level
+from .config import Mounth, Level, Result
 
 # Категории
 class Categories(models.Model):
@@ -45,6 +45,7 @@ class Students(models.Model):
     category  = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
     document = models.FileField(upload_to='documents/')
     teacher  = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    result  = models.CharField("Результат", max_length=1, default='2', choices=Result())
     participation_in_profile_shifts = models.ForeignKey(ProfileShifts, on_delete=models.SET_NULL, null=True, blank=True)
     name_program = models.CharField("Название программы", max_length=1000)
 

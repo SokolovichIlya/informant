@@ -6,6 +6,8 @@ urlpatterns = [
     path('teachers/', TeacherPageView.as_view(), name='teachers'),
     path('students/', StudentPageView.as_view(), name='students'),
 
+    path('export_students/', ExportToExcel.exportToExcelStudents, name='export_students'),
+
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
 ] 

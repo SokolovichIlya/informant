@@ -13,6 +13,8 @@ from .models import Students
 
 import datetime
 
+import xlwt
+
 def customDateSerialize(o):
     if isinstance(o, datetime.date):
         return o.__str__()
@@ -165,3 +167,51 @@ def logout( request):
     logout(request)
     return redirect('/')
 
+
+class ExportToExcel(View):
+    def exportToExcelStudents(request):
+        # на вход фильтры по категории, временнной период, результативность
+        category = request.GET.get('category') or None
+        mounth = request.GET.get('mounth') or None
+        participation_period = request.GET.get('participation_period') or None
+        result = request.GET.get('result') or None
+        
+        
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="students.xls"'
+
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Информация об учениках')
+
+        # Sheet header, first row
+        row_num = 0
+
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+
+        columns = ['ФИО', 'Период участия', 'Месяц', 'Уровень', 'Категория', 'Учитель', 
+                    'Результат', 'Участие в профильных сменах', 'Название программы']
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
+
+        # Sheet body, remaining rows
+        font_style = xlwt.XFStyle()
+
+        # rows = User.objects.all().values_list('username', 'first_name', 'last_name', 'email')
+
+        rows = Students.objects.filter(category=category, mounth=mounth, participation_period=participation_period,
+                                        result=result).values_list('fio', 'participation_period', 'mounth',
+                                        'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
+                                        'name_program') 
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+        
+
+        wb.save(response)
+        return response
+
+    def exportToExcelTeachers(request):
+        pass
