@@ -14,7 +14,8 @@
 
         @include Roboto();
 
-        &:hover {
+        &:hover,
+        &.active {
             background-color: $color-main;
             color: white;
         }

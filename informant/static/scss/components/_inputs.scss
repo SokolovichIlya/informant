@@ -1,0 +1,8 @@
+.search {
+    border: $border;
+    margin-right: 10px;
+    padding: 8px;
+    outline: none;
+    @include Roboto();
+    width: 300px;
+}

@@ -1,0 +1,22 @@
+.header {
+    &-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        @include Roboto();
+    }
+
+    &-title {
+        font-size: 26px;
+        color: $color-text;
+    }
+
+    &-link {
+        color: $color-text;
+
+        &:hover {
+            color: $color-hover;
+        }
+    }
+}

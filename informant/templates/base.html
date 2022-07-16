@@ -11,9 +11,21 @@
     {% block meta %}{% endblock %}
 </head>
 <body>
-    {% block header %}{% endblock header %}
-
     <main class="wrapper">
+        <header class="header">
+            <div class="wrapper-content header-wrapper">
+                <h1 class="header-title">Информант</h1>
+                <a href="" class="header-link">Выход</a>
+            </div>
+        </header>
+
+        <div class="wrapper-content">
+            <div class="breadcrumbs">
+                <a href="/">Главная</a>
+                {% block breadcrumbs %}{% endblock breadcrumbs %}
+            </div>
+        </div>
+
         {% block main %}{% endblock main %}
     </main>  
 

@@ -1,0 +1,18 @@
+.button {
+    padding: 8px 16px;
+    border-radius: 16px;
+    border: none;
+    background-color: $color-main;
+    color: white;
+    outline: none;
+    cursor: pointer;
+    transition: .3s;
+    line-height: 1;
+
+    @include Roboto();
+    font-size: 14px;
+
+    &:hover {
+        background-color: $color-hover;
+    }
+}

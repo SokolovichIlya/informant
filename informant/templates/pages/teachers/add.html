@@ -1,0 +1,32 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}
+<a href="/teachers">Учителя</a>
+<a href="/teachers/add">Добавление записи</a>
+{% endblock breadcrumbs %}
+
+{% block main %}
+<div class="wrapper-content">
+    <div class="page">
+        <div class="page-header page-block">
+            <div class="flex flex-content-between flex-align-center">
+                <form action="">
+                    <input type="search" name="" id="" class="search">
+                    <button type="button" class="button">Поиск</button>
+                </form>
+                <button type="button" class="button">Добавить запись</button>
+            </div>
+        </div>
+        <div class="page-body page-block">
+
+        </div>
+    </div>
+</div>
+{% endblock main %}
+
+{% block scripts %}
+<script>
+
+</script>
+{% endblock scripts %}

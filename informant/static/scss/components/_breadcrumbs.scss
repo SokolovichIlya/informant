@@ -1,0 +1,21 @@
+.breadcrumbs {
+
+    a {
+        color: $color-text;
+        font-size: 16px;
+
+        @include Roboto();
+
+        &:hover {
+            color: $color-hover;
+        }
+
+        & ~ a {
+            margin-left: 5px;
+            &::before {
+                content: '  -  ';
+                margin-right: 5px;
+            }
+        }
+    }
+}
