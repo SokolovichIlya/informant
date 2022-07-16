@@ -36,6 +36,37 @@ class ProfileShifts(models.Model):
         verbose_name = 'Профильная смена'
         verbose_name_plural = 'Профильные смены'
 
+# КПК
+class  Kpk(models.Model):
+    name = models.CharField("Название курсов в соответствии с удостоверением", max_length=1000)
+    city = models.CharField("Город", max_length=1000)
+    organization = models.CharField("Организация в соответствии с удостоверением", max_length=1000)
+    date_issue = models.DateField("Дата выдачи", max_length=1000)
+    number_hours = models.IntegerField("Количество часов", max_length=1000)
+
+    def __str__(self):
+        return self.name
+
+    class Meta():
+        verbose_name = 'КПК'
+        verbose_name_plural = 'КПК'
+
+# Публикации
+class Publications(models.Model):
+    name = models.CharField("Название публиации", max_length=150)
+    name_journal = models.CharField("Название журнала / сборника", max_length=1000)
+    city = models.CharField("Город исздательства", max_length=1000)
+    page_range = models.CharField("Диапазон страниц", max_length=1000)
+
+    def __str__(self):
+        return self.name
+
+    class Meta():
+        verbose_name = 'Публикации'
+        verbose_name_plural = 'Публикации'
+
+
+
 # Данные об учениках
 class Students(models.Model):
     fio = models.CharField("ФИО", max_length=150)
@@ -52,6 +83,26 @@ class Students(models.Model):
     class Meta:
         verbose_name = 'Данные об ученике'
         verbose_name_plural = 'Данные об учениках'
+
+    def __str__(self):
+        return self.fio
+
+
+# Данные об учителях 
+class Teachers(models.Model):
+    fio = models.CharField("ФИО", max_length=150)
+    participation_period = models.CharField("Период участия", max_length=250)
+    mounth = models.CharField("Месяц", max_length=2, default='0', choices=Mounth())
+    level  = models.CharField("Уровень", max_length=1, default='0', choices=Level())
+    category  = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
+    document = models.FileField(upload_to='documents/')
+    result  = models.CharField("Результат", max_length=1, default='2', choices=Result())
+    kpk  = models.ForeignKey(Kpk, on_delete=models.SET_NULL, null=True, blank=True)
+    publications  = models.ForeignKey(Publications, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Данные об учителе'
+        verbose_name_plural = 'Данные об учителе'
 
     def __str__(self):
         return self.fio

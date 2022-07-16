@@ -5,11 +5,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import TemplateView, View
 
 from django.db.models import *
+from django.db.models.functions import Lower
 
 from .forms import LoginForm
 
 
-from .models import Students
+from .models import Students, Teachers
 
 import datetime
 import json
@@ -123,11 +124,12 @@ class Student(View):
             category  = request.data.get('category')
             document = request.data.get('document')
             teacher  = request.data.get('teacher')
+            result  = request.data.get('result')
             participation_in_profile_shifts = request.data.get('participation_in_profile_shifts')
             name_program = request.data.get('name_program')
 
             Students.objects.create(fio, participation_period, mounth, level, category, document, teacher, 
-                                                participation_in_profile_shifts, name_program)
+                                    result, participation_in_profile_shifts, name_program)
 
 
             return HttpResponse(status_code=200)
@@ -145,13 +147,14 @@ class Student(View):
             category  = request.data.get('category')
             document = request.data.get('document')
             teacher  = request.data.get('teacher')
+            result  = request.data.get('result')
             participation_in_profile_shifts = request.data.get('participation_in_profile_shifts')
             name_program = request.data.get('name_program')
 
 
             Students.objects.filter(id=student_id).update(fio=fio, participation_period=participation_period, 
                                                             mounth=mounth, level=level, category=category, 
-                                                            document=document, teacher=teacher, 
+                                                            document=document, teacher=teacher,  result=result,
                                                             participation_in_profile_shifts=participation_in_profile_shifts,
                                                             name_program=name_program)
 
@@ -172,6 +175,93 @@ class Student(View):
         except Exception as e:
             return response(e)
 
+class Teacher(View):
+    def get(self, request):
+        try:
+            fio = request.data.get('fio') or None
+            page = request.data.get('page')
+            per_page = 10 # лимит отображения на странице
+            
+
+            data = Teachers.objects.filter(fio=fio).values()
+
+            total = data.count()
+
+
+            if total%per_page != 0:
+                total_page = total//per_page+1
+            else:
+                total_page = total / per_page
+            
+            teachers = {
+                'data':data,
+                'total': total,
+                'per_page': per_page,
+                'page': page,
+                'total_page': total_page,
+            }
+
+            return JsonResponse(data=teachers, safe=False)
+        
+        except Exception as e:
+            return response(e)
+    
+    def post(self, request):
+        try:
+            fio = request.data.get('fio')
+            participation_period = request.data.get('participation_period')
+            mounth = request.data.get('mounth')
+            level  = request.data.get('level')
+            category  = request.data.get('category')
+            document = request.data.get('document')
+            result  = request.data.get('result')
+            kpk  = request.data.get('kpk')
+            publications  = request.data.get('publications')
+
+            
+            Teacher.objects.create(fio, participation_period, mounth, level, category, document, result, kpk, 
+                                                publications)
+
+
+            return HttpResponse(status_code=200)
+
+        except Exception as e:
+            return response(e)
+
+    def put(self, request):
+        try:
+            teacher_id = request.data.get('student_id')
+            fio = request.data.get('fio')
+            participation_period = request.data.get('participation_period')
+            mounth = request.data.get('mounth')
+            level  = request.data.get('level')
+            category  = request.data.get('category')
+            document = request.data.get('document')
+            result  = request.data.get('result')
+            kpk  = request.data.get('kpk')
+            publications  = request.data.get('publications')
+
+
+            Teacher.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, 
+                                                            mounth=mounth, level=level, category=category, 
+                                                            document=document, result=result, kpk=kpk, publications=publications)
+
+            return HttpResponse(status_code=200)
+        
+        except Exception as e:
+            return response(e)
+
+    def delete(self, request):
+        try:
+            teacher_id = request.data.get('teacher_id')
+
+            teacher = Teacher.objects.get(id=teacher_id)
+            teacher.delete()
+
+            return HttpResponse(status_code=200)
+        
+        except Exception as e:
+            return response(e)
 
 def login(request):
     if request.method == 'POST':
@@ -231,7 +321,7 @@ class ExportToExcel(View):
         rows = Students.objects.filter(category=category, mounth=mounth, participation_period=participation_period,
                                         result=result).values_list('fio', 'participation_period', 'mounth',
                                         'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
-                                        'name_program') 
+                                        'name_program').order_by(Lower('fio'))
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
@@ -242,4 +332,43 @@ class ExportToExcel(View):
         return response
 
     def exportToExcelTeachers(request):
-        pass
+        # на вход фильтры по категории, временнной период, результативность
+        category = request.GET.get('category') or None
+        mounth = request.GET.get('mounth') or None
+        result = request.GET.get('result') or None
+        kpk = request.GET.get('kpk') or None
+        publications = request.GET.get('publications') or None
+        
+        
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="teachers.xls"'
+
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Информация об учителях')
+
+        # Sheet header, first row
+        row_num = 0
+
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+
+        columns = ['ФИО', 'Период участия', 'Месяц', 'Уровень', 'Категория',
+                    'Результат', 'КПК', 'Публикации']
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
+
+        # Sheet body, remaining rows
+        font_style = xlwt.XFStyle()
+
+        rows = Teachers.objects.filter(category=category, mounth=mounth, kpk=kpk, publications=publications,
+                                        result=result).values_list('fio', 'participation_period', 'mounth',
+                                        'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+        
+
+        wb.save(response)
+        return response
