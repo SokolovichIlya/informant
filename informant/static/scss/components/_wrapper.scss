@@ -13,7 +13,6 @@ $container-size: 1200px + ($padding * 2);
     &-content {
         max-width: $container-size;
         margin: 0 auto;
-        height: 100%;
         padding: $padding;
     }
 }

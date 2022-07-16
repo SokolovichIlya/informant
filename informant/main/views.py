@@ -12,6 +12,7 @@ from .forms import LoginForm
 from .models import Students
 
 import datetime
+import json
 
 import xlwt
 
@@ -39,7 +40,34 @@ class TeacherPageView(TemplateView):
         # teachers = Teachers.objects.all()
         # groups = GroupsSchool.objects.all()
 
-        context = {'teachers': None, 'groups': None}
+        teachers = {
+            'data': [
+                {
+                    'fio': 'Иванов Иван Иванович',
+                    'fio_1': 'Иванов Иван Иванович1',
+                    'fio_2': 'Иванов Иван Иванович2',
+                    'fio_3': 'Иванов Иван Иванович3',
+                },
+                {
+                    'fio': 'Иванов Иван Иванович',
+                    'fio_1': 'Иванов Иван Иванович1',
+                    'fio_2': 'Иванов Иван Иванович2',
+                    'fio_3': 'Иванов Иван Иванович3',
+                },
+                {
+                    'fio': 'Иванов Иван Иванович',
+                    'fio_1': 'Иванов Иван Иванович1',
+                    'fio_2': 'Иванов Иван Иванович2',
+                    'fio_3': 'Иванов Иван Иванович3',
+                },
+            ],
+            'total': 3,
+            'per_page': 10,
+            'page': 1,
+            'total_page': 1,
+        }
+
+        context = {'teachers': json.dumps(teachers), 'groups': None}
 
         return context
 

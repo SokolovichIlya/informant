@@ -1,13 +1,21 @@
 {% extends 'pages/base.html' %}
+{% load static %}
 
-{% block header %}
-{% endblock header %}
+{% block breadcrumbs %}
+<a href="/teachers">Учителя</a>
+{% endblock breadcrumbs %}
 
 {% block main %}
 <div class="wrapper-content">
     <div class="page">
         <div class="page-header page-block">
-
+            <div class="flex flex-content-between flex-align-center">
+                <form action="">
+                    <input type="search" name="" id="" class="search">
+                    <button type="button" class="button">Поиск</button>
+                </form>
+                <a href="/teachers/add" class="button">Добавить запись</a>
+            </div>
         </div>
         <div class="page-body page-block">
             {% include 'components/global/tableTeacher.html' %}
@@ -18,4 +26,18 @@
 {% endblock main %}
 
 {% block scripts %}
+<script src="{% static 'js/table.js' %}"></script>
+
+<script>
+let data = {{ teachers|safe }}
+
+let keys = {
+    'fio': 'Заголовок',
+    'fio_1': 'Заголовок 1',
+    'fio_2': 'Заголовок 2',
+    'fio_3': 'Заголовок 3',
+}
+
+init(data, keys)
+</script>
 {% endblock scripts %}
