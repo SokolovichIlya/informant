@@ -1,0 +1,25 @@
+.form {
+    &-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        &:not(:last-child) {
+            margin-bottom: 15px;
+        }
+        
+        @include Roboto();
+
+        label {
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            max-width: 50%;
+            border: $border;
+            padding: 8px 16px;
+            outline: none;
+        }
+    }
+}

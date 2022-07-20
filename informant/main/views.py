@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView, View
 from django.db.models import *
 from django.db.models.functions import Lower
 
-from .forms import LoginForm
+from .forms import LoginForm, StudentsForm
 
 
 from .models import Students, Teachers
@@ -22,67 +22,25 @@ def customDateSerialize(o):
         return o.__str__()
 
 class HomePageView(TemplateView):
-
     template_name = "pages/home.html"
 
-    def get_context_data(self, **kwargs):
-        # teachers = Teachers.objects.all()
-        # groups = GroupsSchool.objects.all()
-
-        context = {'teachers': None, 'groups': None}
-
-        return context
-
 class TeacherPageView(TemplateView):
-
     template_name = "pages/teachers/list.html"
 
-    def get_context_data(self, **kwargs):
-        # teachers = Teachers.objects.all()
-        # groups = GroupsSchool.objects.all()
-
-        teachers = {
-            'data': [
-                {
-                    'fio': 'Иванов Иван Иванович',
-                    'fio_1': 'Иванов Иван Иванович1',
-                    'fio_2': 'Иванов Иван Иванович2',
-                    'fio_3': 'Иванов Иван Иванович3',
-                },
-                {
-                    'fio': 'Иванов Иван Иванович',
-                    'fio_1': 'Иванов Иван Иванович1',
-                    'fio_2': 'Иванов Иван Иванович2',
-                    'fio_3': 'Иванов Иван Иванович3',
-                },
-                {
-                    'fio': 'Иванов Иван Иванович',
-                    'fio_1': 'Иванов Иван Иванович1',
-                    'fio_2': 'Иванов Иван Иванович2',
-                    'fio_3': 'Иванов Иван Иванович3',
-                },
-            ],
-            'total': 3,
-            'per_page': 10,
-            'page': 1,
-            'total_page': 1,
-        }
-
-        context = {'teachers': json.dumps(teachers), 'groups': None}
-
-        return context
-
 class StudentPageView(TemplateView):
-
     template_name = "pages/students/list.html"
 
-    def get_context_data(self, **kwargs):
-        # teachers = Teachers.objects.all()
-        # groups = GroupsSchool.objects.all()
+class StudentAddPageView(TemplateView):
+    template_name = "pages/students/add.html"
 
-        context = {'teachers': None, 'groups': None}
+class TeacherAddPageView(TemplateView):
+    template_name = "pages/teachers/add.html"
+
+    def get_context_data(self, **kwargs):
+        context = {'form': StudentsForm}
 
         return context
+
 
 class Student(View):
     def get(self, request):
