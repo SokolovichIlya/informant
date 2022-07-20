@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView, View
 from django.db.models import *
 from django.db.models.functions import Lower
 
-from .forms import LoginForm, StudentsForm
+from .forms import LoginForm, StudentsForm, TeachersForm
 
 
 from .models import Students, Teachers
@@ -75,12 +75,14 @@ class Student(View):
     
     def post(self, request):
         try:
+            form = StudentsForm(request.POST, request.FILES)
+
             fio = request.POST('fio')
             participation_period = request.POST('participation_period')
             mounth = request.POST('mounth')
             level  = request.POST('level')
             category  = request.POST('category')
-            document = request.POST('document')
+            document = request.FILES['document']
             teacher  = request.POST('teacher')
             result  = request.POST('result')
             participation_in_profile_shifts = request.POST('participation_in_profile_shifts')
@@ -97,13 +99,15 @@ class Student(View):
 
     def put(self, request):
         try:
+            form = StudentsForm(request.POST, request.FILES)
+
             student_id = request.POST('student_id')
             fio = request.POST('fio')
             participation_period = request.POST('participation_period')
             mounth = request.POST('mounth')
             level  = request.POST('level')
             category  = request.POST('category')
-            document = request.POST('document')
+            document = request.FILES['document']
             teacher  = request.POST('teacher')
             result  = request.POST('result')
             participation_in_profile_shifts = request.POST('participation_in_profile_shifts')
@@ -166,12 +170,14 @@ class Teacher(View):
     
     def post(self, request):
         try:
+            form = TeachersForm(request.POST, request.FILES)
+
             fio = request.POST('fio')
             participation_period = request.POST('participation_period')
             mounth = request.POST('mounth')
             level  = request.POST('level')
             category  = request.POST('category')
-            document = request.POST('document')
+            document = request.FILES['document']
             result  = request.POST('result')
             kpk  = request.POST('kpk')
             publications  = request.POST('publications')
@@ -188,13 +194,15 @@ class Teacher(View):
 
     def put(self, request):
         try:
+            form = TeachersForm(request.POST, request.FILES)
+
             teacher_id = request.POST('student_id')
             fio = request.POST('fio')
             participation_period = request.POST('participation_period')
             mounth = request.POST('mounth')
             level  = request.POST('level')
             category  = request.POST('category')
-            document = request.POST('document')
+            document = request.FILES['document']
             result  = request.POST('result')
             kpk  = request.POST('kpk')
             publications  = request.POST('publications')
