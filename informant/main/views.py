@@ -87,8 +87,8 @@ class StudentPageView(TemplateView):
 class Student(View):
     def get(self, request):
         try:
-            fio = request.data.get('fio') or None
-            page = request.data.get('page')
+            fio = request.GET('fio') or None
+            page = request.GET('page')
             per_page = 10 # лимит отображения на странице
             
 
@@ -117,16 +117,16 @@ class Student(View):
     
     def post(self, request):
         try:
-            fio = request.data.get('fio')
-            participation_period = request.data.get('participation_period')
-            mounth = request.data.get('mounth')
-            level  = request.data.get('level')
-            category  = request.data.get('category')
-            document = request.data.get('document')
-            teacher  = request.data.get('teacher')
-            result  = request.data.get('result')
-            participation_in_profile_shifts = request.data.get('participation_in_profile_shifts')
-            name_program = request.data.get('name_program')
+            fio = request.POST('fio')
+            participation_period = request.POST('participation_period')
+            mounth = request.POST('mounth')
+            level  = request.POST('level')
+            category  = request.POST('category')
+            document = request.POST('document')
+            teacher  = request.POST('teacher')
+            result  = request.POST('result')
+            participation_in_profile_shifts = request.POST('participation_in_profile_shifts')
+            name_program = request.POST('name_program')
 
             Students.objects.create(fio, participation_period, mounth, level, category, document, teacher, 
                                     result, participation_in_profile_shifts, name_program)
@@ -139,17 +139,17 @@ class Student(View):
 
     def put(self, request):
         try:
-            student_id = request.data.get('student_id')
-            fio = request.data.get('fio')
-            participation_period = request.data.get('participation_period')
-            mounth = request.data.get('mounth')
-            level  = request.data.get('level')
-            category  = request.data.get('category')
-            document = request.data.get('document')
-            teacher  = request.data.get('teacher')
-            result  = request.data.get('result')
-            participation_in_profile_shifts = request.data.get('participation_in_profile_shifts')
-            name_program = request.data.get('name_program')
+            student_id = request.POST('student_id')
+            fio = request.POST('fio')
+            participation_period = request.POST('participation_period')
+            mounth = request.POST('mounth')
+            level  = request.POST('level')
+            category  = request.POST('category')
+            document = request.POST('document')
+            teacher  = request.POST('teacher')
+            result  = request.POST('result')
+            participation_in_profile_shifts = request.POST('participation_in_profile_shifts')
+            name_program = request.POST('name_program')
 
 
             Students.objects.filter(id=student_id).update(fio=fio, participation_period=participation_period, 
@@ -165,7 +165,7 @@ class Student(View):
 
     def delete(self, request):
         try:
-            student_id = request.data.get('student_id')
+            student_id = request.POST('student_id')
 
             student = Students.objects.get(id=student_id)
             student.delete()
@@ -178,8 +178,8 @@ class Student(View):
 class Teacher(View):
     def get(self, request):
         try:
-            fio = request.data.get('fio') or None
-            page = request.data.get('page')
+            fio = request.GET('fio') or None
+            page = request.GET('page')
             per_page = 10 # лимит отображения на странице
             
 
@@ -208,15 +208,15 @@ class Teacher(View):
     
     def post(self, request):
         try:
-            fio = request.data.get('fio')
-            participation_period = request.data.get('participation_period')
-            mounth = request.data.get('mounth')
-            level  = request.data.get('level')
-            category  = request.data.get('category')
-            document = request.data.get('document')
-            result  = request.data.get('result')
-            kpk  = request.data.get('kpk')
-            publications  = request.data.get('publications')
+            fio = request.POST('fio')
+            participation_period = request.POST('participation_period')
+            mounth = request.POST('mounth')
+            level  = request.POST('level')
+            category  = request.POST('category')
+            document = request.POST('document')
+            result  = request.POST('result')
+            kpk  = request.POST('kpk')
+            publications  = request.POST('publications')
 
             
             Teacher.objects.create(fio, participation_period, mounth, level, category, document, result, kpk, 
@@ -230,16 +230,16 @@ class Teacher(View):
 
     def put(self, request):
         try:
-            teacher_id = request.data.get('student_id')
-            fio = request.data.get('fio')
-            participation_period = request.data.get('participation_period')
-            mounth = request.data.get('mounth')
-            level  = request.data.get('level')
-            category  = request.data.get('category')
-            document = request.data.get('document')
-            result  = request.data.get('result')
-            kpk  = request.data.get('kpk')
-            publications  = request.data.get('publications')
+            teacher_id = request.POST('student_id')
+            fio = request.POST('fio')
+            participation_period = request.POST('participation_period')
+            mounth = request.POST('mounth')
+            level  = request.POST('level')
+            category  = request.POST('category')
+            document = request.POST('document')
+            result  = request.POST('result')
+            kpk  = request.POST('kpk')
+            publications  = request.POST('publications')
 
 
             Teacher.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, 
@@ -253,7 +253,7 @@ class Teacher(View):
 
     def delete(self, request):
         try:
-            teacher_id = request.data.get('teacher_id')
+            teacher_id = request.POST('teacher_id')
 
             teacher = Teacher.objects.get(id=teacher_id)
             teacher.delete()
@@ -289,10 +289,10 @@ def logout( request):
 class ExportToExcel(View):
     def exportToExcelStudents(request):
         # на вход фильтры по категории, временнной период, результативность
-        category = request.GET.get('category') or None
-        mounth = request.GET.get('mounth') or None
-        participation_period = request.GET.get('participation_period') or None
-        result = request.GET.get('result') or None
+        category = request.GET('category') or None
+        mounth = request.GET('mounth') or None
+        participation_period = request.GET('participation_period') or None
+        result = request.GET('result') or None
         
         
         response = HttpResponse(content_type='application/ms-excel')
@@ -333,11 +333,11 @@ class ExportToExcel(View):
 
     def exportToExcelTeachers(request):
         # на вход фильтры по категории, временнной период, результативность
-        category = request.GET.get('category') or None
-        mounth = request.GET.get('mounth') or None
-        result = request.GET.get('result') or None
-        kpk = request.GET.get('kpk') or None
-        publications = request.GET.get('publications') or None
+        category = request.GET('category') or None
+        mounth = request.GET('mounth') or None
+        result = request.GET('result') or None
+        kpk = request.GET('kpk') or None
+        publications = request.GET('publications') or None
         
         
         response = HttpResponse(content_type='application/ms-excel')
