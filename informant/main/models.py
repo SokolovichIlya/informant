@@ -37,13 +37,14 @@ class ProfileShifts(models.Model):
         verbose_name_plural = 'Профильные смены'
 
 # КПК
-class  Kpk(models.Model):
+class Kpk(models.Model):
     name = models.CharField("Название курсов в соответствии с удостоверением", max_length=1000)
-    city = models.CharField("Город", max_length=1000)
-    organization = models.CharField("Организация в соответствии с удостоверением", max_length=1000)
-    date_issue = models.DateField("Дата выдачи", max_length=1000)
-    number_hours = models.IntegerField("Количество часов", max_length=1000)
-    type_kpk = models.CharField("ТипКпк", max_length=1, default='0', choices=TypeKpk()) 
+    city = models.CharField("Город", max_length=1000, blank=True, null = True)
+    organization = models.CharField("Организация в соответствии с удостоверением", max_length=1000,  blank=True, null = True)
+    date_issue = models.DateField("Дата выдачи", max_length=1000,  blank=True, null = True)
+    number_hours = models.IntegerField("Количество часов", max_length=1000,  blank=True, null = True)
+    document = models.FileField(upload_to='kpk/', blank=True, null = True)
+    default_view = models.BooleanField("Показывать по умолчанию", default=False) 
 
     def __str__(self):
         return self.name
