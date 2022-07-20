@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .config import Mounth, Level, Result
+from .config import Mounth, Level, Result, TypeKpk
 
 # Категории
 class Categories(models.Model):
@@ -43,6 +43,7 @@ class  Kpk(models.Model):
     organization = models.CharField("Организация в соответствии с удостоверением", max_length=1000)
     date_issue = models.DateField("Дата выдачи", max_length=1000)
     number_hours = models.IntegerField("Количество часов", max_length=1000)
+    type_kpk = models.CharField("ТипКпк", max_length=1, default='0', choices=TypeKpk()) 
 
     def __str__(self):
         return self.name
