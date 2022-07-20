@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .config import Mounth, Level
+from .config import Mounth, Level, Result
 
 # Категории
 class Categories(models.Model):
@@ -42,10 +42,12 @@ class Students(models.Model):
     participation_period = models.CharField("Период участия", max_length=250)
     mounth = models.CharField("Месяц", max_length=2, default='0', choices=Mounth())
     level  = models.CharField("Уровень", max_length=1, default='0', choices=Level())
-    category  = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
-    document = models.FileField(upload_to='documents/')
-    teacher  = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    participation_in_profile_shifts = models.ForeignKey(ProfileShifts, on_delete=models.SET_NULL, null=True, blank=True)
+    category  = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория')
+    sub_category  = models.ForeignKey(SubCategories, on_delete=models.CASCADE, verbose_name='Подкатегория')
+    document = models.FileField("Документ", upload_to='documents/')
+    teacher  = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Учитель-наставник')
+    result = models.CharField("Результат", max_length=1, default='0', choices=Result())
+    participation_in_profile_shifts = models.ForeignKey(ProfileShifts, on_delete=models.CASCADE, verbose_name='Участие в профильных сменах')
     name_program = models.CharField("Название программы", max_length=1000)
 
     class Meta:

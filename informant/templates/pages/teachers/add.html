@@ -9,17 +9,25 @@
 {% block main %}
 <div class="wrapper-content">
     <div class="page">
-        <div class="page-header page-block">
-            <div class="flex flex-content-between flex-align-center">
-                <form action="">
-                    <input type="search" name="" id="" class="search">
-                    <button type="button" class="button">Поиск</button>
-                </form>
-                <button type="button" class="button">Добавить запись</button>
-            </div>
-        </div>
         <div class="page-body page-block">
+            <form action="" class="form">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                            <div class="alert alert-danger">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
 
+                <button class="button">Сохранить</button>
+            </form>
         </div>
     </div>
 </div>

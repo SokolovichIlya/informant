@@ -7,6 +7,8 @@ $container-size: 1200px + ($padding * 2);
 .wrapper {
     position: relative;
     width: 100%;
+    height: fit-content;
+    min-height: 100%;
 
     background-color: $color-bg;
 
