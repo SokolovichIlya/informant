@@ -11,6 +11,9 @@ urlpatterns = [
     path('export_students/', ExportToExcel.exportToExcelStudents, name='export_students'),
     path('export_teaches/', ExportToExcel.exportToExcelTeachers, name='export_teaches'),
 
+    path('download_file_students/', DownloadFile.downloadFileStudents, name='download_file_students'),
+    path('download_file_teaches/', DownloadFile.downloadFileTeachers, name='download_file_teaches'),
+
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
 ] 

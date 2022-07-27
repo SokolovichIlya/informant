@@ -7,13 +7,20 @@ from django.views.generic.base import TemplateView, View
 from django.db.models import *
 from django.db.models.functions import Lower
 
+from django.conf import settings
+
+
 from .forms import LoginForm, StudentsForm, TeachersForm
 
+from functools import reduce
+import operator
 
 from .models import Students, Teachers
 
 import datetime
 import json
+
+import os
 
 import xlwt
 
@@ -45,8 +52,8 @@ class TeacherAddPageView(TemplateView):
 class Student(View):
     def get(self, request):
         try:
-            fio = request.GET('fio') or None
-            page = request.GET('page')
+            fio = request.GET.get('fio') or None
+            page = request.GET.get('page')
             per_page = 10 # лимит отображения на странице
             
 
@@ -77,16 +84,16 @@ class Student(View):
         try:
             form = StudentsForm(request.POST, request.FILES)
 
-            fio = request.POST('fio')
-            participation_period = request.POST('participation_period')
-            mounth = request.POST('mounth')
-            level  = request.POST('level')
-            category  = request.POST('category')
+            fio = request.POST.get('fio')
+            participation_period = request.POST.get('participation_period')
+            mounth = request.POST.get('mounth')
+            level  = request.POST.get('level')
+            category  = request.POST.get('category')
             document = request.FILES['document']
-            teacher  = request.POST('teacher')
-            result  = request.POST('result')
-            participation_in_profile_shifts = request.POST('participation_in_profile_shifts')
-            name_program = request.POST('name_program')
+            teacher  = request.POST.get('teacher')
+            result  = request.POST.get('result')
+            participation_in_profile_shifts = request.POST.get('participation_in_profile_shifts')
+            name_program = request.POST.get('name_program')
 
             Students.objects.create(fio, participation_period, mounth, level, category, document, teacher, 
                                     result, participation_in_profile_shifts, name_program)
@@ -99,19 +106,19 @@ class Student(View):
 
     def put(self, request):
         try:
-            form = StudentsForm(request.POST, request.FILES)
+            form = StudentsForm(request.POST.get, request.FILES)
 
-            student_id = request.POST('student_id')
-            fio = request.POST('fio')
-            participation_period = request.POST('participation_period')
-            mounth = request.POST('mounth')
-            level  = request.POST('level')
-            category  = request.POST('category')
+            student_id = request.POST.get('student_id')
+            fio = request.POST.get('fio')
+            participation_period = request.POST.get('participation_period')
+            mounth = request.POST.get('mounth')
+            level  = request.POST.get('level')
+            category  = request.POST.get('category')
             document = request.FILES['document']
-            teacher  = request.POST('teacher')
-            result  = request.POST('result')
-            participation_in_profile_shifts = request.POST('participation_in_profile_shifts')
-            name_program = request.POST('name_program')
+            teacher  = request.POST.get('teacher')
+            result  = request.POST.get('result')
+            participation_in_profile_shifts = request.POST.get('participation_in_profile_shifts')
+            name_program = request.POST.get('name_program')
 
 
             Students.objects.filter(id=student_id).update(fio=fio, participation_period=participation_period, 
@@ -127,7 +134,7 @@ class Student(View):
 
     def delete(self, request):
         try:
-            student_id = request.POST('student_id')
+            student_id = request.POST.get('student_id')
 
             student = Students.objects.get(id=student_id)
             student.delete()
@@ -140,8 +147,8 @@ class Student(View):
 class Teacher(View):
     def get(self, request):
         try:
-            fio = request.GET('fio') or None
-            page = request.GET('page')
+            fio = request.GET.get('fio') or None
+            page = request.GET.get('page')
             per_page = 10 # лимит отображения на странице
             
 
@@ -170,20 +177,20 @@ class Teacher(View):
     
     def post(self, request):
         try:
-            form = TeachersForm(request.POST, request.FILES)
+            form = TeachersForm(request.POST.get, request.FILES)
 
-            fio = request.POST('fio')
-            participation_period = request.POST('participation_period')
-            mounth = request.POST('mounth')
-            level  = request.POST('level')
-            category  = request.POST('category')
+            fio = request.POST.get('fio')
+            participation_period = request.POST.get('participation_period')
+            mounth = request.POST.get('mounth')
+            level  = request.POST.get('level')
+            category  = request.POST.get('category')
             document = request.FILES['document']
-            result  = request.POST('result')
-            kpk  = request.POST('kpk')
-            publications  = request.POST('publications')
+            result  = request.POST.get('result')
+            kpk  = request.POST.get('kpk')
+            publications  = request.POST.get('publications')
 
             
-            Teacher.objects.create(fio, participation_period, mounth, level, category, document, result, kpk, 
+            Teachers.objects.create(fio, participation_period, mounth, level, category, document, result, kpk, 
                                                 publications)
 
 
@@ -194,21 +201,21 @@ class Teacher(View):
 
     def put(self, request):
         try:
-            form = TeachersForm(request.POST, request.FILES)
+            form = TeachersForm(request.POST.get, request.FILES)
 
-            teacher_id = request.POST('student_id')
-            fio = request.POST('fio')
-            participation_period = request.POST('participation_period')
-            mounth = request.POST('mounth')
-            level  = request.POST('level')
-            category  = request.POST('category')
+            teacher_id = request.POST.get('student_id')
+            fio = request.POST.get('fio')
+            participation_period = request.POST.get('participation_period')
+            mounth = request.POST.get('mounth')
+            level  = request.POST.get('level')
+            category  = request.POST.get('category')
             document = request.FILES['document']
-            result  = request.POST('result')
-            kpk  = request.POST('kpk')
-            publications  = request.POST('publications')
+            result  = request.POST.get('result')
+            kpk  = request.POST.get('kpk')
+            publications  = request.POST.get('publications')
 
 
-            Teacher.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, 
+            Teachers.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, 
                                                             mounth=mounth, level=level, category=category, 
                                                             document=document, result=result, kpk=kpk, publications=publications)
 
@@ -219,9 +226,9 @@ class Teacher(View):
 
     def delete(self, request):
         try:
-            teacher_id = request.POST('teacher_id')
+            teacher_id = request.POST.get('teacher_id')
 
-            teacher = Teacher.objects.get(id=teacher_id)
+            teacher = Teachers.objects.get(id=teacher_id)
             teacher.delete()
 
             return HttpResponse(status_code=200)
@@ -230,8 +237,8 @@ class Teacher(View):
             return response(e)
 
 def login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
+    if request.method == 'POST.get':
+        form = LoginForm(request.POST.get)
         if form.is_valid():
             cd = form.cleaned_data
             user = authenticate(username=cd['username'], password=cd['password'])
@@ -255,11 +262,24 @@ def logout( request):
 class ExportToExcel(View):
     def exportToExcelStudents(request):
         # на вход фильтры по категории, временнной период, результативность
-        category = request.GET('category') or None
-        mounth = request.GET('mounth') or None
-        participation_period = request.GET('participation_period') or None
-        result = request.GET('result') or None
-        
+
+        filters = {}
+
+        category = request.GET.get('category') 
+        if category != None:
+            filters['category'] = category
+        mounth = request.GET.get('mounth') 
+        if mounth != None: 
+            mounth = int(mounth)
+            filters['mounth'] = mounth
+        participation_period = request.GET.get('participation_period') 
+        if participation_period != None:
+            filters['participation_period'] = participation_period
+        result = request.GET.get('result') 
+        if result != None: 
+            result = int(result)
+            filters['result'] = result
+
         
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="students.xls"'
@@ -282,12 +302,17 @@ class ExportToExcel(View):
         # Sheet body, remaining rows
         font_style = xlwt.XFStyle()
 
-        # rows = User.objects.all().values_list('username', 'first_name', 'last_name', 'email')
 
-        rows = Students.objects.filter(category=category, mounth=mounth, participation_period=participation_period,
-                                        result=result).values_list('fio', 'participation_period', 'mounth',
+        if len(filters) != 0:
+            rows = Students.objects.filter(**filters).values_list('fio', 'participation_period', 'mounth',
                                         'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
                                         'name_program').order_by(Lower('fio'))
+        else:
+            rows = Students.objects.all().values_list('fio', 'participation_period', 'mounth',
+                                        'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
+                                        'name_program').order_by(Lower('fio'))
+
+
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
@@ -299,11 +324,26 @@ class ExportToExcel(View):
 
     def exportToExcelTeachers(request):
         # на вход фильтры по категории, временнной период, результативность
-        category = request.GET('category') or None
-        mounth = request.GET('mounth') or None
-        result = request.GET('result') or None
-        kpk = request.GET('kpk') or None
-        publications = request.GET('publications') or None
+        filters = {}
+
+        category = request.GET.get('category') 
+        if category != None:
+            filters['category'] = category
+        mounth = request.GET.get('mounth') 
+        if mounth != None: 
+            mounth = int(mounth)
+            filters['mounth'] = mounth
+        result = request.GET.get('result') 
+        if result != None: 
+            result = int(result)
+            filters['result'] = result
+        kpk = request.GET.get('kpk') 
+        if kpk != None:
+            filters['kpk'] = kpk
+        publications = request.GET.get('publications') 
+        if publications != None:
+            filters['publications'] = publications
+
         
         
         response = HttpResponse(content_type='application/ms-excel')
@@ -327,9 +367,13 @@ class ExportToExcel(View):
         # Sheet body, remaining rows
         font_style = xlwt.XFStyle()
 
-        rows = Teachers.objects.filter(category=category, mounth=mounth, kpk=kpk, publications=publications,
-                                        result=result).values_list('fio', 'participation_period', 'mounth',
+        if len(filters) != 0:
+            rows = Teachers.objects.filter(**filters).values_list('fio', 'participation_period', 'mounth',
                                         'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
+        else:
+            rows = Teachers.objects.all().values_list('fio', 'participation_period', 'mounth',
+                                        'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
+
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
@@ -338,3 +382,38 @@ class ExportToExcel(View):
 
         wb.save(response)
         return response
+
+
+class DownloadFile(View):
+    def downloadFileStudents(request):
+        student_id = request.GET.get('student_id')
+
+        fileStudent = Students.objects.values_list('document').get(id=student_id)
+
+        file_name = fileStudent[0].split('/')
+
+
+        path_download = f"{settings.MEDIA_ROOT}\\{fileStudent[0]}"
+
+        if os.path.exists(path_download):
+            with open(path_download, 'rb') as fl:
+                response = HttpResponse(fl.read(), charset='utf-8')
+                response['Content-Disposition'] = 'attachment; filename={0}'.format(file_name[1])
+                response['Content-Length'] = os.path.getsize(path_download)
+                return response
+  
+    def downloadFileTeachers(request):
+        teacher_id = request.GET.get('teacher_id')
+
+        fileTeacher = Teachers.objects.values_list('document').get(id=teacher_id)
+        file_name = fileTeacher[0].split('/')
+
+
+        path_download = f"{settings.MEDIA_ROOT}\\{fileTeacher[0]}"
+
+        if os.path.exists(path_download):
+            with open(path_download, 'rb') as fl:
+                response = HttpResponse(fl.read(), charset='utf-8')
+                response['Content-Disposition'] = 'attachment; filename={0}'.format(file_name[1])
+                response['Content-Length'] = os.path.getsize(path_download)
+                return response

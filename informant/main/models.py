@@ -42,7 +42,7 @@ class Kpk(models.Model):
     city = models.CharField("Город", max_length=1000, blank=True, null = True)
     organization = models.CharField("Организация в соответствии с удостоверением", max_length=1000,  blank=True, null = True)
     date_issue = models.DateField("Дата выдачи", max_length=1000,  blank=True, null = True)
-    number_hours = models.IntegerField("Количество часов", max_length=1000,  blank=True, null = True)
+    number_hours = models.IntegerField("Количество часов",  blank=True, null = True)
     document = models.FileField(upload_to='kpk/', blank=True, null = True)
     default_view = models.BooleanField("Показывать по умолчанию", default=False) 
 
