@@ -1,27 +1,18 @@
-from urllib import response
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.base import TemplateView, View
-
+from django.contrib.auth.models import User
 from django.db.models import *
 from django.db.models.functions import Lower
-
+from .models import *
+from .forms import LoginForm, StudentsForm, TeachersForm
 from django.conf import settings
 
-
-from .forms import LoginForm, StudentsForm, TeachersForm
-
-from functools import reduce
 import operator
-
-from .models import Students, Teachers
-
 import datetime
 import json
-
 import os
-
 import xlwt
 
 def customDateSerialize(o):
@@ -40,6 +31,21 @@ class StudentPageView(TemplateView):
 class StudentAddPageView(TemplateView):
     template_name = "pages/students/add.html"
 
+    def get_context_data(self, **kwargs):
+        teachers = User.objects.all()
+        categories = Categories.objects.all()
+        subCategories = SubCategories.objects.all()
+        profileShifts = ProfileShifts.objects.all()
+
+        context = {
+            'teachers': teachers,
+            'categories': categories,
+            'subCategories': subCategories,
+            'profileShifts': profileShifts,
+        }
+
+        return context
+
 class TeacherAddPageView(TemplateView):
     template_name = "pages/teachers/add.html"
 
@@ -56,11 +62,12 @@ class Student(View):
             page = request.GET.get('page')
             per_page = 10 # лимит отображения на странице
             
-
-            data = Students.objects.filter(fio=fio).values()
+            if fio:
+                data = Students.objects.filter(fio=fio).values()
+            else:
+                data = Students.objects.all().values()
 
             total = data.count()
-
 
             if total%per_page != 0:
                 total_page = total//per_page+1
@@ -68,7 +75,7 @@ class Student(View):
                 total_page = total / per_page
             
             students = {
-                'data':data,
+                'data': list(data),
                 'total': total,
                 'per_page': per_page,
                 'page': page,
@@ -78,7 +85,8 @@ class Student(View):
             return JsonResponse(data=students, safe=False)
         
         except Exception as e:
-            return response(e)
+            print(e)
+
     
     def post(self, request):
         try:
@@ -99,10 +107,11 @@ class Student(View):
                                     result, participation_in_profile_shifts, name_program)
 
 
-            return HttpResponse(status_code=200)
+            return JsonResponse(data=True, status=200)
 
         except Exception as e:
-            return response(e)
+            print(e)
+            return HttpResponse(status=401)
 
     def put(self, request):
         try:
@@ -237,15 +246,15 @@ class Teacher(View):
             return response(e)
 
 def login(request):
-    if request.method == 'POST.get':
-        form = LoginForm(request.POST.get)
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             user = authenticate(username=cd['username'], password=cd['password'])
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return HttpResponse(status_code=200)
+                    return redirect('/')
                 else:
                     return HttpResponse(status_code=401)
             else:
@@ -254,9 +263,9 @@ def login(request):
         form = LoginForm()
     return render(request, 'auth/login.html', {'form': form})
 
-def logout( request):
+def logout(request):
     logout(request)
-    return redirect('/')
+    return redirect('/login')
 
 
 class ExportToExcel(View):

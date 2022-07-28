@@ -23,3 +23,47 @@
         }
     }
 }
+
+.form-login {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    padding: 15px;
+    border-radius: 15px;
+    width: 400px;
+
+    @include Roboto();
+
+    label {
+        margin-bottom: 5px;
+    }
+
+    input,
+    select {
+        max-width: 100% !important;
+        border: $border;
+        padding: 8px 16px;
+        outline: none;
+    }
+
+    h2 {
+        margin-bottom: 30px;
+    }
+
+    .login-form {
+        width: 100%;
+    }
+
+    .login-form-wrapper {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        button {
+            margin-top: 30px;
+        }
+    }
+}

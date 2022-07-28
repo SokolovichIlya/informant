@@ -68,7 +68,6 @@ class Publications(models.Model):
         verbose_name_plural = 'Публикации'
 
 
-
 # Данные об учениках
 class Students(models.Model):
     fio = models.CharField("ФИО", max_length=150)

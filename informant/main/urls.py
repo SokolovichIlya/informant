@@ -14,6 +14,8 @@ urlpatterns = [
     path('download_file_students/', DownloadFile.downloadFileStudents, name='download_file_students'),
     path('download_file_teaches/', DownloadFile.downloadFileTeachers, name='download_file_teaches'),
 
+    path('student/', Student.as_view(), name='student'),
+
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
 ] 

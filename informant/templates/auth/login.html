@@ -1,21 +1,27 @@
-{% extends "base.html" %}
-{% block title %}Log-in{% endblock %}
-{% block content %}
-    <h1>Log-in</h1>
-    {% if form.errors %}
-        <p>
-            Your username and password didn't match.
-            Please try again.
-        </p>
-    {% else %}
-        <p>Please, use the following form to log-in:</p>
-    {% endif %}
-    <div class="login-form">
-        <form action="{% url 'login' %}" method="post">
-            {{ form.as_p }}
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ next }}"/>
-            <p><input type="submit" value="Log-in"></p>
-        </form>
+{% extends "emptybase.html" %}
+
+{% block main %}
+    <div class="wrapper-content">
+        <div class="h-100 w-100 flex flex-content-center">
+            <div class="form-login">
+                <h2>Вход</h2>
+                <div class="login-form">
+                    <form action="{% url 'login' %}" method="post" class="login-form-wrapper">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_username">Логин:</label>
+                            <input type="text" name="username" required="" id="id_username">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_password">Пароль:</label>
+                            <input type="password" name="password" required="" id="id_password">
+                        </div>
+                        <input type="hidden" name="next" value="{{ next }}"/>
+                        <button class="button">Войти</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
 {% endblock %}

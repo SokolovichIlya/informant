@@ -1,0 +1,109 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}
+<a href="/students">Ученики</a>
+<a href="/students/add">Добавление записи</a>
+{% endblock breadcrumbs %}
+
+{% block main %}
+<div class="wrapper-content">
+    <div class="page">
+        <div class="page-body page-block">
+            <form action="/student/" method="POST" class="form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_fio">ФИО:</label>
+                    <input type="text" name="fio" maxlength="150" required="" id="id_fio">
+                </div>
+                <div class="form-group">
+                    <label for="id_participation_period">Период участия:</label>
+                    <input type="text" name="participation_period" maxlength="250" required="" id="id_participation_period">
+                </div>
+                <div class="form-group">
+                    <label for="id_mounth">Месяц:</label>
+                    <select name="mounth" id="id_mounth">
+                        <option value="0" selected="">Январь</option>
+                        <option value="1">Февраль</option>
+                        <option value="2">Март</option>
+                        <option value="3">Апрель</option>
+                        <option value="4">Май</option>
+                        <option value="5">Июнь</option>
+                        <option value="6">Июль</option>
+                        <option value="7">Август</option>
+                        <option value="8">Сентябрь</option>
+                        <option value="9">Октябрь</option>
+                        <option value="10">Ноябрь</option>
+                        <option value="11">Декабрь</option>
+                    </select>   
+                </div>
+                <div class="form-group">
+                    <label for="id_level">Уровень:</label>
+                    <select name="level" id="id_level">
+                        <option value="0" selected="">Муниципальный</option>
+                        <option value="1">Региональный</option>
+                        <option value="2">Федеральный</option>
+                    </select>    
+                </div>  
+                <div class="form-group">
+                    <label for="id_category">Категория:</label>
+                    <select name="category" id="id_category">
+                        <option value="" selected="">---------</option>
+                        {% for category in categories %}
+                        <optgroup label="{{ category.name }}">
+                            {% for subCategory in subCategories %}
+                                {% if subCategory.category == category %}
+                                    <option>{{ subCategory.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>   
+                </div>  
+                <div class="form-group">
+                    <label for="id_document">Подтверждающий документ:</label>
+                    <input type="file" name="document" required="" id="id_document">
+                </div>                
+                <div class="form-group">
+                    <label for="id_teacher">Учитель-наставник:</label>
+                    <select name="teacher" id="id_teacher">
+                        <option value="" selected="">---------</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.id }}" selected="">{{ teacher.last_name }} {{ teacher.first_name }}</option>
+                        {% endfor %}
+                    </select> 
+                </div>  
+                <div class="form-group">
+                    <label for="id_result">Результат:</label>
+                    <select name="result" id="id_result">
+                        <option value="0">Победитель</option>
+                        <option value="1">Призер</option>
+                        <option value="2" selected="">Участник</option>
+                    </select> 
+                </div>                
+                <div class="form-group">
+                    <label for="id_participation_in_profile_shifts">Участие в профильных сменах:</label>
+                    <select name="participation_in_profile_shifts" id="id_participation_in_profile_shifts">
+                        <option value="" selected="">---------</option>
+                        {% for profile in profileShifts %}
+                        <option value="{{ profile.id }}" selected="">{{ profile.name }}</option>
+                        {% endfor %}
+                    </select>   
+                </div>             
+                <div class="form-group">
+                    <label for="id_name_program">Название программы:</label>
+                    <input type="text" name="name_program" maxlength="1000" required="" id="id_name_program">
+                </div>
+                <button class="button">Сохранить</button>
+                <a href="/students" class="button">Назад</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock main %}
+
+{% block scripts %}
+<script>
+
+</script>
+{% endblock scripts %}

@@ -14,7 +14,7 @@
                     <input type="search" name="" id="" class="search">
                     <button type="button" class="button">Поиск</button>
                 </form>
-                <button type="button" class="button">Добавить запись</button>
+                <a href="/students/add" class="button">Добавить запись</a>
             </div>
         </div>
         <div class="page-body page-block">
@@ -29,15 +29,23 @@
 <script src="{% static 'js/table.js' %}"></script>
 
 <script>
-let data = {{ teachers|safe }}
+$.ajax({
+	url: '/student', 
+	method: 'get',            
+	data: {
+        page: 1,
+    },    
+	success: function(data) { 
 
-let keys = {
-    'fio': 'Заголовок',
-    'fio_1': 'Заголовок 1',
-    'fio_2': 'Заголовок 2',
-    'fio_3': 'Заголовок 3',
-}
+        let keys = {
+            'fio': 'ФИО',
+            'participation_period': 'Период участия',
+        }
 
-init(data, keys)
+        let url = '/student'
+
+        init(data, keys, url)         
+	}
+});
 </script>
 {% endblock scripts %}

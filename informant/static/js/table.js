@@ -1,4 +1,4 @@
-function init(data, keys) {
+function init(data, keys, url) {
     const perPage = data.per_page
 
     const page = data.page
@@ -46,6 +46,8 @@ function init(data, keys) {
             for (const key in keys) {
                 tbodyItem += `<td>${item[key]}</td>`
             }
+
+            tbodyItem += `<td><a href="${url}"></a></td>`
 
             tbodyItem += `</tr>`
 
