@@ -1,11 +1,15 @@
+import imp
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
+from django.contrib.auth import logout as django_logout
+from django.contrib.auth import login as django_login
 from django.views.generic.base import TemplateView, View
 from django.contrib.auth.models import User
 from django.db.models import *
 from django.db.models.functions import Lower
 from .models import *
+from .config import *
 from .forms import LoginForm, StudentsForm, TeachersForm
 from django.conf import settings
 
@@ -86,28 +90,32 @@ class Student(View):
         
         except Exception as e:
             print(e)
-
-    
+ 
     def post(self, request):
         try:
-            form = StudentsForm(request.POST, request.FILES)
+            if request.user.is_authenticated:
+                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
+                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
 
-            fio = request.POST.get('fio')
-            participation_period = request.POST.get('participation_period')
-            mounth = request.POST.get('mounth')
-            level  = request.POST.get('level')
-            category  = request.POST.get('category')
-            document = request.FILES['document']
-            teacher  = request.POST.get('teacher')
-            result  = request.POST.get('result')
-            participation_in_profile_shifts = request.POST.get('participation_in_profile_shifts')
-            name_program = request.POST.get('name_program')
+                fio = request.POST.get('fio')
+                participation_period = request.POST.get('participation_period')
+                mounth = request.POST.get('mounth')
+                level  = request.POST.get('level')
+                category  = Categories.objects.get(pk=id_category)
+                sub_category  = SubCategories.objects.get(pk=id_sub_category)
+                document = request.FILES['document']
+                teacher  = User.objects.get(pk=request.POST.get('teacher'))
+                result  = request.POST.get('result')
+                participation_in_profile_shifts = ProfileShifts.objects.get(pk=request.POST.get('participation_in_profile_shifts'))
+                name_program = request.POST.get('name_program')
 
-            Students.objects.create(fio, participation_period, mounth, level, category, document, teacher, 
-                                    result, participation_in_profile_shifts, name_program)
+                Students.objects.create(fio=fio, participation_period=participation_period, mounth=mounth, level=level, 
+                                        category=category,sub_category=sub_category, document=document, teacher=teacher, 
+                                        result=result, participation_in_profile_shifts=participation_in_profile_shifts, 
+                                        name_program=name_program)
 
 
-            return JsonResponse(data=True, status=200)
+                return redirect('/students/')
 
         except Exception as e:
             print(e)
@@ -115,28 +123,33 @@ class Student(View):
 
     def put(self, request):
         try:
-            form = StudentsForm(request.POST.get, request.FILES)
+            if request.user.is_authenticated:
+                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
+                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
 
-            student_id = request.POST.get('student_id')
-            fio = request.POST.get('fio')
-            participation_period = request.POST.get('participation_period')
-            mounth = request.POST.get('mounth')
-            level  = request.POST.get('level')
-            category  = request.POST.get('category')
-            document = request.FILES['document']
-            teacher  = request.POST.get('teacher')
-            result  = request.POST.get('result')
-            participation_in_profile_shifts = request.POST.get('participation_in_profile_shifts')
-            name_program = request.POST.get('name_program')
+                student_id = request.POST.get('student_id')
+
+                fio = request.POST.get('fio')
+                participation_period = request.POST.get('participation_period')
+                mounth = request.POST.get('mounth')
+                level  = request.POST.get('level')
+                category  = Categories.objects.get(pk=id_category)
+                sub_category  = SubCategories.objects.get(pk=id_sub_category)
+                document = request.FILES['document']
+                teacher  = User.objects.get(pk=request.POST.get('teacher'))
+                result  = request.POST.get('result')
+                participation_in_profile_shifts = ProfileShifts.objects.get(pk=request.POST.get('participation_in_profile_shifts'))
+                name_program = request.POST.get('name_program')
 
 
             Students.objects.filter(id=student_id).update(fio=fio, participation_period=participation_period, 
                                                             mounth=mounth, level=level, category=category, 
+                                                            sub_category=sub_category,
                                                             document=document, teacher=teacher,  result=result,
                                                             participation_in_profile_shifts=participation_in_profile_shifts,
                                                             name_program=name_program)
 
-            return HttpResponse(status_code=200)
+            return redirect('/students/')
         
         except Exception as e:
             return response(e)
@@ -186,49 +199,56 @@ class Teacher(View):
     
     def post(self, request):
         try:
-            form = TeachersForm(request.POST.get, request.FILES)
+            if request.user.is_authenticated:
+                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
 
-            fio = request.POST.get('fio')
-            participation_period = request.POST.get('participation_period')
-            mounth = request.POST.get('mounth')
-            level  = request.POST.get('level')
-            category  = request.POST.get('category')
-            document = request.FILES['document']
-            result  = request.POST.get('result')
-            kpk  = request.POST.get('kpk')
-            publications  = request.POST.get('publications')
-
-            
-            Teachers.objects.create(fio, participation_period, mounth, level, category, document, result, kpk, 
-                                                publications)
+                fio = request.POST.get('fio')
+                participation_period = request.POST.get('participation_period')
+                mounth = request.POST.get('mounth')
+                level  = request.POST.get('level')
+                category  = Categories.objects.get(pk=id_category)
+                document = request.FILES['document']
+                result  = request.POST.get('result')
+                kpk  = Kpk.objects.get(pk=request.POST.get('kpk'))
+                publications  = Publications.objects.get(pk=request.POST.get('kpk'))
 
 
-            return HttpResponse(status_code=200)
+                Teachers.objects.create(fio=fio, participation_period=participation_period, mounth=mounth, 
+                                        level=level, category=category, document=document, result=result, 
+                                        kpk=kpk, publications=publications)
+
+
+                return redirect('/teachers/')
 
         except Exception as e:
             return response(e)
 
     def put(self, request):
         try:
-            form = TeachersForm(request.POST.get, request.FILES)
-
-            teacher_id = request.POST.get('student_id')
-            fio = request.POST.get('fio')
-            participation_period = request.POST.get('participation_period')
-            mounth = request.POST.get('mounth')
-            level  = request.POST.get('level')
-            category  = request.POST.get('category')
-            document = request.FILES['document']
-            result  = request.POST.get('result')
-            kpk  = request.POST.get('kpk')
-            publications  = request.POST.get('publications')
 
 
-            Teachers.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, 
-                                                            mounth=mounth, level=level, category=category, 
-                                                            document=document, result=result, kpk=kpk, publications=publications)
+            if request.user.is_authenticated:
+                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
+                
+                teacher_id = request.POST.get('student_id')
 
-            return HttpResponse(status_code=200)
+
+                fio = request.POST.get('fio')
+                participation_period = request.POST.get('participation_period')
+                mounth = request.POST.get('mounth')
+                level  = request.POST.get('level')
+                category  = Categories.objects.get(pk=id_category)
+                document = request.FILES['document']
+                result  = request.POST.get('result')
+                kpk  = Kpk.objects.get(pk=request.POST.get('kpk'))
+                publications  = Publications.objects.get(pk=request.POST.get('kpk'))
+
+
+                Teachers.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, 
+                                                                mounth=mounth, level=level, category=category, 
+                                                                document=document, result=result, kpk=kpk, publications=publications)
+
+                return redirect('/teachers/')
         
         except Exception as e:
             return response(e)
@@ -253,7 +273,8 @@ def login(request):
             user = authenticate(username=cd['username'], password=cd['password'])
             if user is not None:
                 if user.is_active:
-                    login(request, user)
+                    print(user)
+                    django_login(request, user)
                     return redirect('/')
                 else:
                     return HttpResponse(status_code=401)
@@ -264,8 +285,8 @@ def login(request):
     return render(request, 'auth/login.html', {'form': form})
 
 def logout(request):
-    logout(request)
-    return redirect('/login')
+    django_logout(request)
+    return redirect('/')
 
 
 class ExportToExcel(View):
@@ -322,7 +343,29 @@ class ExportToExcel(View):
                                         'name_program').order_by(Lower('fio'))
 
 
+        
+
+
         for row in rows:
+            row = list(row)
+
+            for mounth in Mounth():
+                if mounth[0] == row[2]:
+                    row[2] = mounth[1]
+
+            for level in Level():
+                if level[0] == row[3]:
+                    row[3] = level[1]
+
+            row[4] = Categories.objects.get(pk=row[4]).name
+            row[5] = User.objects.get(pk=row[5]).username
+
+            for result in Result():
+                if result[0] == row[6]:
+                    row[6] = result[1]
+
+            row[7]= ProfileShifts.objects.get(pk=row[7]).name
+
             row_num += 1
             for col_num in range(len(row)):
                 ws.write(row_num, col_num, row[col_num], font_style)
@@ -384,6 +427,20 @@ class ExportToExcel(View):
                                         'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
 
         for row in rows:
+            row = list(row)
+
+            for mounth in Mounth():
+                if mounth[0] == row[2]:
+                    row[2] = mounth[1]
+
+            for level in Level():
+                if level[0] == row[3]:
+                    row[3] = level[1]
+
+            row[4] = Categories.objects.get(pk=row[4]).name
+            row[5] = Kpk.objects.get(pk=row[4]).name
+            row[6]= Publications.objects.get(pk=row[7]).name
+
             row_num += 1
             for col_num in range(len(row)):
                 ws.write(row_num, col_num, row[col_num], font_style)

@@ -10,7 +10,7 @@
 <div class="wrapper-content">
     <div class="page">
         <div class="page-body page-block">
-            <form action="/student/" method="POST" class="form">
+            <form enctype="multipart/form-data" action="/student/" method="POST" class="form">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="id_fio">ФИО:</label>

@@ -75,6 +75,7 @@ class Students(models.Model):
     mounth = models.CharField("Месяц", max_length=2, default='0', choices=Mounth())
     level  = models.CharField("Уровень", max_length=1, default='0', choices=Level())
     category  = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
+    sub_category  = models.ForeignKey(SubCategories, on_delete=models.SET_NULL, null=True, blank=True) 
     document = models.FileField(upload_to='documents/')
     teacher  = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     result  = models.CharField("Результат", max_length=1, default='2', choices=Result())

@@ -10,7 +10,7 @@
 <div class="wrapper-content">
     <div class="page">
         <div class="page-body page-block">
-            <form action="/student/" method="POST" class="form">
+            <form enctype="multipart/form-data" action="/student/" method="POST" class="form">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="id_fio">ФИО:</label>
@@ -95,7 +95,7 @@
                     <input type="text" name="name_program" maxlength="1000" required="" id="id_name_program">
                 </div>
                 <button class="button">Сохранить</button>
-                <a href="/students" class="button">Назад</a>
+                <a href="/students/" class="button">Назад</a>
             </form>
         </div>
     </div>
