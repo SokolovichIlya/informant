@@ -99,7 +99,7 @@ class Student(View):
             return JsonResponse(data=students, safe=False)
         
         except Exception as e:
-            print(e)
+            return HttpResponse(status=401)
  
     def post(self, request):
         try:
@@ -162,7 +162,7 @@ class Student(View):
             return redirect('/students/')
         
         except Exception as e:
-            return response(e)
+            return HttpResponse(status=401)
 
     def delete(self, request):
         try:
@@ -174,7 +174,7 @@ class Student(View):
             return HttpResponse(status_code=200)
         
         except Exception as e:
-            return response(e)
+            return HttpResponse(status=401)
 
 
 class StudentDetail(View):
@@ -226,42 +226,91 @@ class Teacher(View):
             return JsonResponse(data=teachers, safe=False)
         
         except Exception as e:
-            return response(e)
+            return HttpResponse(status=401)
     
     def post(self, request):
         try:
             if request.user.is_authenticated:
                 id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
+                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
+                
+                kpk_id  = request.POST.get('kpk')
+                if kpk_id == None:
+                    kpk_name = request.POST.get('kpk_name')
+                    kpk_city = request.POST.get('kpk_city')
+                    kpk_organization = request.POST.get('kpk_organization')
+                    kpk_date_issue = request.POST.get('kpk_date_issue')
+                    kpk_number_hours = request.POST.get('kpk_number_hours')
+
+                    kpk_id = Kpk.objects.create(kpk_name=kpk_name, kpk_city=kpk_city, kpk_organization=kpk_organization, 
+                                        kpk_date_issue=kpk_date_issue, kpk_number_hours=kpk_number_hours)
+                    kpk_id = kpk_id.pk
+
+                publications_name = request.POST.get('publications_name')
+                publications_name_journal = request.POST.get('publications_name_journal')
+                publications_city = request.POST.get('publications_city')
+                publications_page_range = request.POST.get('publications_page_range')
+                
+                publications_id = Publications.objects.create(name=publications_name, 
+                                    name_journal=publications_name_journal, 
+                                    city=publications_city, 
+                                    page_range=publications_page_range)
+
 
                 fio = request.POST.get('fio')
                 participation_period = request.POST.get('participation_period')
                 mounth = request.POST.get('mounth')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(pk=id_category)
-                document = request.FILES['document']
+                sub_category  = SubCategories.objects.get(pk=id_sub_category)
+                category_document = request.FILES['category_document']
                 result  = request.POST.get('result')
-                kpk  = Kpk.objects.get(pk=request.POST.get('kpk'))
-                publications  = Publications.objects.get(pk=request.POST.get('kpk'))
-
+                kpk = Kpk.objects.get(pk=kpk_id)
+                kpk_document = request.FILES['kpk_document']
+                publications  = Publications.objects.get(pk=publications_id.pk)
+                publications_document = request.FILES['publications_document']
+                
 
                 Teachers.objects.create(fio=fio, participation_period=participation_period, mounth=mounth, 
-                                        level=level, category=category, document=document, result=result, 
-                                        kpk=kpk, publications=publications)
+                                        level=level, category=category,sub_category=sub_category, category_document=category_document, result=result, 
+                                        kpk=kpk, kpk_document=kpk_document, publications=publications, 
+                                        publications_document=publications_document)
 
 
                 return redirect('/teachers/')
 
         except Exception as e:
-            return response(e)
+            return HttpResponse(status=401)
 
     def put(self, request):
         try:
-
-
             if request.user.is_authenticated:
-                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
-                
                 teacher_id = request.POST.get('student_id')
+
+                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
+                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
+                
+                kpk_id  = request.POST.get('kpk')
+                if kpk_id == None:
+                    kpk_name = request.POST.get('kpk_name')
+                    kpk_city = request.POST.get('kpk_city')
+                    kpk_organization = request.POST.get('kpk_organization')
+                    kpk_date_issue = request.POST.get('kpk_date_issue')
+                    kpk_number_hours = request.POST.get('kpk_number_hours')
+
+                    kpk_id = Kpk.objects.create(kpk_name=kpk_name, kpk_city=kpk_city, kpk_organization=kpk_organization, 
+                                        kpk_date_issue=kpk_date_issue, kpk_number_hours=kpk_number_hours)
+                    kpk_id = kpk_id.pk
+
+                publications_name = request.POST.get('publications_name')
+                publications_name_journal = request.POST.get('publications_name_journal')
+                publications_city = request.POST.get('publications_city')
+                publications_page_range = request.POST.get('publications_page_range')
+                
+                publications_id = Publications.objects.create(name=publications_name, 
+                                    name_journal=publications_name_journal, 
+                                    city=publications_city, 
+                                    page_range=publications_page_range)
 
 
                 fio = request.POST.get('fio')
@@ -269,20 +318,25 @@ class Teacher(View):
                 mounth = request.POST.get('mounth')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(pk=id_category)
-                document = request.FILES['document']
+                sub_category  = SubCategories.objects.get(pk=id_sub_category)
+                category_document = request.FILES['category_document']
                 result  = request.POST.get('result')
-                kpk  = Kpk.objects.get(pk=request.POST.get('kpk'))
-                publications  = Publications.objects.get(pk=request.POST.get('kpk'))
+                kpk = Kpk.objects.get(pk=kpk_id)
+                kpk_document = request.FILES['kpk_document']
+                publications  = Publications.objects.get(pk=publications_id.pk)
+                publications_document = request.FILES['publications_document']
+                
 
+                Teachers.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, mounth=mounth, 
+                                        level=level, category=category,sub_category=sub_category, category_document=category_document, result=result, 
+                                        kpk=kpk, kpk_document=kpk_document, publications=publications, 
+                                        publications_document=publications_document)
 
-                Teachers.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, 
-                                                                mounth=mounth, level=level, category=category, 
-                                                                document=document, result=result, kpk=kpk, publications=publications)
 
                 return redirect('/teachers/')
         
         except Exception as e:
-            return response(e)
+            return HttpResponse(status=401)
 
     def delete(self, request):
         try:
@@ -294,7 +348,7 @@ class Teacher(View):
             return HttpResponse(status_code=200)
         
         except Exception as e:
-            return response(e)
+            return HttpResponse(status=401)
 
 
 def login(request):
