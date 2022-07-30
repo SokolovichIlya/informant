@@ -47,7 +47,12 @@ function init(data, keys, url) {
                 tbodyItem += `<td>${item[key]}</td>`
             }
 
-            tbodyItem += `<td><a href="${url}"></a></td>`
+            tbodyItem +=    `<td width="15">
+                                <div class="column flex-gap-5">
+                                    <a href="/${url}/${item.id}">Редактировать</a>
+                                    <a href="${url}">Удалить</a>
+                                </div>
+                            </td>`
 
             tbodyItem += `</tr>`
 

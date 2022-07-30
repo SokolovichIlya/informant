@@ -10,23 +10,123 @@
 <div class="wrapper-content">
     <div class="page">
         <div class="page-body page-block">
-            <form action="" class="form">
+            <form enctype="multipart/form-data" action="/student/" method="POST" class="form">
                 {% csrf_token %}
-                {% for field in form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                            <div class="alert alert-danger">
-                                {{ error }}
-                            </div>
+                <div class="form-group">
+                    <label for="id_fio">ФИО:</label>
+                    <input type="text" name="fio" maxlength="150" required="" id="id_fio">
+                </div>
+                <div class="form-group">
+                    <label for="id_participation_period">Период участия:</label>
+                    <input type="text" name="participation_period" maxlength="250" required="" id="id_participation_period">
+                </div>
+                <div class="form-group">
+                    <label for="id_mounth">Месяц:</label>
+                    <select name="mounth" id="id_mounth">
+                        <option value="0" selected="">Январь</option>
+                        <option value="1">Февраль</option>
+                        <option value="2">Март</option>
+                        <option value="3">Апрель</option>
+                        <option value="4">Май</option>
+                        <option value="5">Июнь</option>
+                        <option value="6">Июль</option>
+                        <option value="7">Август</option>
+                        <option value="8">Сентябрь</option>
+                        <option value="9">Октябрь</option>
+                        <option value="10">Ноябрь</option>
+                        <option value="11">Декабрь</option>
+                    </select>   
+                </div>
+                <div class="form-group">
+                    <label for="id_level">Уровень:</label>
+                    <select name="level" id="id_level">
+                        <option value="0" selected="">Муниципальный</option>
+                        <option value="1">Региональный</option>
+                        <option value="2">Федеральный</option>
+                    </select>    
+                </div>  
+                <div class="form-group">
+                    <label for="id_category">Категория:</label>
+                    <select name="category" id="id_category">
+                        {% for category in categories %}
+                        <optgroup label="{{ category.name }}">
+                            {% for subCategory in subCategories %}
+                                {% if subCategory.category == category %}
+                                    <option>{{ subCategory.name }}</option>
+                                {% endif %}
                             {% endfor %}
-                        {% endif %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>   
+                </div>  
+                <div class="form-group">
+                    <label for="id_document">Подтверждающий документ категории:</label>
+                    <input type="file" name="document" required="" id="id_document">
+                </div>                
+                <div class="form-group">
+                    <label for="id_result">Результат:</label>
+                    <select name="result" id="id_result">
+                        <option value="0">Победитель</option>
+                        <option value="1">Призер</option>
+                        <option value="2" selected="">Участник</option>
+                    </select> 
+                </div>   
+                <div class="form-group">
+                    <label for="kpk">КПК:</label>
+                    <select name="kpk" id="kpk">
+                        {% for kpk_item in kpk %}
+                            <option value="{{ kpk_item.id }}">{{ kpk_item.name }}</option>
+                        {% endfor %}
+                    </select>    
+                </div>   
+                <div id="kpkGroup">
+                    <div class="form-group">
+                        <label for="kpk_name">Название курсов в соответствии с удостоверением:</label>
+                        <input type="text" name="kpk_name" maxlength="250" id="kpk_name">
                     </div>
-                {% endfor %}
-
+                    <div class="form-group">
+                        <label for="kpk_city">Город:</label>
+                        <input type="text" name="kpk_city" maxlength="250" id="kpk_city">
+                    </div>
+                    <div class="form-group">
+                        <label for="kpk_organization">Организация в соответствии с удостоверением:</label>
+                        <input type="text" name="kpk_organization" maxlength="250" id="kpk_organization">
+                    </div>
+                    <div class="form-group">
+                        <label for="kpk_date_issue">Дата выдачи в форматие ДД.ММ.ГГ:</label>
+                        <input type="text" name="kpk_date_issue" maxlength="250" id="kpk_date_issue">
+                    </div>
+                    <div class="form-group">
+                        <label for="kpk_number_hours">Количество часов:</label>
+                        <input type="text" name="kpk_number_hours" maxlength="250" id="kpk_number_hours">
+                    </div>                    
+                </div>
+                <div class="form-group">
+                    <label for="kpk_document">Подтверждающий документ КПК:</label>
+                    <input type="file" name="kpk_document" required="" id="kpk_document">
+                </div>     
+                <div class="form-group">
+                    <label for="publications_name">Название публикации:</label>
+                    <input type="text" name="publications_name" maxlength="250" required="" id="publications_name">
+                </div>
+                <div class="form-group">
+                    <label for="publications_name_journal">Название журнала / сборника:</label>
+                    <input type="text" name="publications_name_journal" maxlength="250" required="" id="publications_name_journal">
+                </div>
+                <div class="form-group">
+                    <label for="publications_city">Город издательства:</label>
+                    <input type="text" name="publications_city" maxlength="250" required="" id="publications_city">
+                </div>
+                <div class="form-group">
+                    <label for="publications_page_range">Диапазон страниц:</label>
+                    <input type="text" name="publications_page_range" maxlength="250" required="" id="publications_page_range">
+                </div>
+                <div class="form-group">
+                    <label for="publications_document">Подтверждающий документ публикация:</label>
+                    <input type="file" name="publications_document" required="" id="publications_document">
+                </div>                                       
                 <button class="button">Сохранить</button>
+                <a href="/students/" class="button">Назад</a>
             </form>
         </div>
     </div>
@@ -35,6 +135,23 @@
 
 {% block scripts %}
 <script>
+$("document").ready(() => {
+    checkKPKSelect()
+})
+
+$('#kpk').change((item) => {
+    checkKPKSelect()
+})
+
+function checkKPKSelect() {
+    if ($('#kpk option:selected').text() === 'Иное') {
+        $('#kpkGroup').show()
+
+        return
+    }
+
+    $('#kpkGroup').hide()       
+}
 
 </script>
 {% endblock scripts %}

@@ -12,18 +12,19 @@
         <div class="page-body page-block">
             <form enctype="multipart/form-data" action="/student/" method="POST" class="form">
                 {% csrf_token %}
+                <input type="hidden" name="id" value="{{ student.id }}">
                 <div class="form-group">
                     <label for="id_fio">ФИО:</label>
-                    <input type="text" name="fio" maxlength="150" required="" id="id_fio">
+                    <input type="text" name="fio" maxlength="150" required="" id="id_fio" value="{{ student.fio }}">
                 </div>
                 <div class="form-group">
                     <label for="id_participation_period">Период участия:</label>
-                    <input type="text" name="participation_period" maxlength="250" required="" id="id_participation_period">
+                    <input type="text" name="participation_period" maxlength="250" required="" id="id_participation_period" value="{{ student.participation_period }}">
                 </div>
                 <div class="form-group">
                     <label for="id_mounth">Месяц:</label>
                     <select name="mounth" id="id_mounth">
-                        <option value="0" selected="">Январь</option>
+                        <option value="0">Январь</option>
                         <option value="1">Февраль</option>
                         <option value="2">Март</option>
                         <option value="3">Апрель</option>
@@ -40,7 +41,7 @@
                 <div class="form-group">
                     <label for="id_level">Уровень:</label>
                     <select name="level" id="id_level">
-                        <option value="0" selected="">Муниципальный</option>
+                        <option value="0">Муниципальный</option>
                         <option value="1">Региональный</option>
                         <option value="2">Федеральный</option>
                     </select>    
@@ -53,7 +54,11 @@
                         <optgroup label="{{ category.name }}">
                             {% for subCategory in subCategories %}
                                 {% if subCategory.category == category %}
-                                    <option>{{ subCategory.name }}</option>
+                                    {% if subCategory == student.sub_category %}
+                                    <option selected>{{ subCategory.name }}</option>
+                                    {% else %}
+                                    <option >{{ subCategory.name }}</option>
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </optgroup>
@@ -61,15 +66,21 @@
                     </select>   
                 </div>  
                 <div class="form-group">
-                    <label for="id_document">Подтверждающий документ:</label>
-                    <input type="file" name="document" required="" id="id_document">
+                    <label for="id_document">Подтверждающий документ: </label>
+                    <input type="file" name="document" id="id_document" value="http://127.0.0.1:8000/media/{{ student.document }}">
+
+                    <a class="margin-top" href="/media/{{ student.document }}">Указанный документ</a>
                 </div>                
                 <div class="form-group">
                     <label for="id_teacher">Учитель-наставник:</label>
                     <select name="teacher" id="id_teacher">
                         <option value="" selected="">---------</option>
                         {% for teacher in teachers %}
-                        <option value="{{ teacher.id }}" selected="">{{ teacher.last_name }} {{ teacher.first_name }}</option>
+                            {% if teacher == student.teacher %}
+                                <option value="{{ teacher.id }}" selected>{{ teacher.last_name }} {{ teacher.first_name }}</option>
+                            {% else %}
+                                <option value="{{ teacher.id }}">{{ teacher.last_name }} {{ teacher.first_name }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select> 
                 </div>  
@@ -78,7 +89,7 @@
                     <select name="result" id="id_result">
                         <option value="0">Победитель</option>
                         <option value="1">Призер</option>
-                        <option value="2" selected="">Участник</option>
+                        <option value="2">Участник</option>
                     </select> 
                 </div>                
                 <div class="form-group">
@@ -86,13 +97,17 @@
                     <select name="participation_in_profile_shifts" id="id_participation_in_profile_shifts">
                         <option value="" selected="">---------</option>
                         {% for profile in profileShifts %}
-                        <option value="{{ profile.id }}" selected="">{{ profile.name }}</option>
+                            {% if profile == student.participation_in_profile_shifts  %}
+                                <option value="{{ profile.id }}" selected>{{ profile.name }}</option>
+                            {% else %}
+                                <option value="{{ profile.id }}">{{ profile.name }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>   
                 </div>             
                 <div class="form-group">
                     <label for="id_name_program">Название программы:</label>
-                    <input type="text" name="name_program" maxlength="1000" required="" id="id_name_program">
+                    <input type="text" name="name_program" maxlength="1000" required="" id="id_name_program" value="{{ student.name_program }}">
                 </div>
                 <button class="button">Сохранить</button>
                 <a href="/students" class="button">Назад</a>
@@ -104,6 +119,19 @@
 
 {% block scripts %}
 <script>
+$('#id_mounth').val('{{ student.mounth }}')
+$('#id_level').val('{{ student.level }}')
+$('#id_result').val('{{ student.result }}')
 
+const fileInput = document.querySelector('#id_document');
+
+const myFile = new File(['Файл'], '/media/{{ student.document }}', {
+    type: 'text/plain',
+    lastModified: new Date(),
+});
+
+const dataTransfer = new DataTransfer();
+dataTransfer.items.add(myFile);
+fileInput.files = dataTransfer.files;
 </script>
 {% endblock scripts %}

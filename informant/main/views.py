@@ -54,7 +54,17 @@ class TeacherAddPageView(TemplateView):
     template_name = "pages/teachers/add.html"
 
     def get_context_data(self, **kwargs):
-        context = {'form': StudentsForm}
+        categories = Categories.objects.all()
+        subCategories = SubCategories.objects.all()
+        kpk = Kpk.objects.filter(default_view = True)
+        publications = Publications.objects.all()
+
+        context = {
+            'kpk': kpk,
+            'categories': categories,
+            'subCategories': subCategories,
+            'publications': publications,
+        }
 
         return context
 
@@ -166,6 +176,27 @@ class Student(View):
         except Exception as e:
             return response(e)
 
+
+class StudentDetail(View):
+    def get(self, request, id):
+        student = Students.objects.get(id = id)
+        teachers = User.objects.all()
+        categories = Categories.objects.all()
+        subCategories = SubCategories.objects.all()
+        profileShifts = ProfileShifts.objects.all()
+
+        context = {
+            'teachers': teachers,
+            'categories': categories,
+            'subCategories': subCategories,
+            'profileShifts': profileShifts,
+            'student': student,
+        }
+
+
+        return render(request, 'pages/students/detail.html', context) 
+
+
 class Teacher(View):
     def get(self, request):
         try:
@@ -265,6 +296,7 @@ class Teacher(View):
         except Exception as e:
             return response(e)
 
+
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -284,9 +316,10 @@ def login(request):
         form = LoginForm()
     return render(request, 'auth/login.html', {'form': form})
 
+
 def logout(request):
     django_logout(request)
-    return redirect('/')
+    return redirect('/login')
 
 
 class ExportToExcel(View):
