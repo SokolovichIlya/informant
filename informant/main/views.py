@@ -245,12 +245,12 @@ class Teacher(View):
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(pk=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(pk=request.POST.get('sub_category'))
-                category_document = request.FILES['category_document']
+                category_document = request.FILES['document']
                 result  = request.POST.get('result')
                 kpk = Kpk.objects.get(pk=request.POST.get('kpk'))
-                kpk_document = request.FILES['kpk_document']
+                kpk_document = request.FILES['documentKpk']
                 publications  = Publications.objects.get(pk=publications_id.pk)
-                publications_document = request.FILES['publications_document']
+                publications_document = request.FILES['documentPublication']
                 
 
                 Teachers.objects.create(fio=fio, participation_period=participation_period, mounth=mounth, 
@@ -262,6 +262,7 @@ class Teacher(View):
                 return redirect('/teachers/')
 
         except Exception as e:
+            print(e)
             return HttpResponse(status=401)
 
     def update(request):
