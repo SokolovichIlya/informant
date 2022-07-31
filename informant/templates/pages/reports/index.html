@@ -1,0 +1,170 @@
+{% extends 'pages/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}
+<a href="/reports">Выгрузка данных</a>
+{% endblock breadcrumbs %}
+
+{% block main %}
+<div class="wrapper-content" id="app">
+    <div class="page">
+        <div class="page-header page-block">
+            <div class="flex w-100">
+                <el-form :model="form" class="w-100" label-position="left" ref="form" label-width="300px">
+                    <el-form-item label="Информант">
+                        <el-select class="w-100" v-model="form.type" placeholder="Информант">
+                            <el-option label="Ученик" value="0"></el-option>
+                            <el-option label="Учитель" value="1"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="form.type === '1'" label="Выберите учителя" prop="result">
+                        <el-select filterable class="w-100" v-model="form.teacher" placeholder="">
+                            <el-option v-for="item in teachers" :label="`${item.last_name} ${item.first_name}`" :value="item.id"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="Временной период с">
+                        <el-date-picker
+                            v-model="form.date_from"
+                            type="date"
+                            placeholder=""
+                            format="dd.MM.yyyy"
+                        >
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="Временной период по">
+                        <el-date-picker
+                            v-model="form.date_to"
+                            type="date"
+                            placeholder=""
+                            format="dd.MM.yyyy"
+                        >
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item v-if="form.type === '0'" label="Категория" prop="category">
+                        <el-select class="w-100" v-model="form.category" placeholder="">
+                            <el-option label="Олимпиады" value="0"></el-option>
+                            <el-option label="Конференции" value="1"></el-option>
+                            <el-option label="Конкурсы" value="2"></el-option>
+                            <el-option label="Профильные смены" value="3"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="form.type === '1'" label="Категория" prop="category">
+                        <el-select class="w-100" v-model="form.category" placeholder="">
+                            <el-option label="Олимпиады" value="0"></el-option>
+                            <el-option label="Конференции" value="1"></el-option>
+                            <el-option label="Публикации" value="2"></el-option>
+                            <el-option label="Конкурсы" value="3"></el-option>
+                            <el-option label="КПК" value="4"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="form.type === '1' && form.category === '4'" label="КПК" prop="kpk">
+                        <el-select class="w-100" v-model="form.kpk" placeholder="">
+                                <el-option 
+                                    v-for="item in kpkList" 
+                                    :label="item.name" 
+                                    :value="item.id"
+                                ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="Результат" prop="result">
+                        <el-select class="w-100" v-model="form.result" placeholder="">
+                            <el-option v-for="item in resultList" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="form.type === '1'" label="Категория участия ученика" prop="student_category">
+                        <el-select class="w-100" v-model="form.student_category" placeholder="">
+                            <el-option label="Олимпиады" value="0"></el-option>
+                            <el-option label="Конференции" value="1"></el-option>
+                            <el-option label="Конкурсы" value="2"></el-option>
+                            <el-option label="Профильные смены" value="3"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="form.type === '1'" label="Результат ученика" prop="student_result">
+                        <el-select class="w-100" v-model="form.student_result" placeholder="">
+                            <el-option v-for="item in resultList" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="submitForm('student')">Сформировать</el-button>
+                        <el-button @click="backList()">Сбросить</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main %}
+
+{% block scripts %}
+<script src="{% static 'js/config.js' %}"></script>
+<script src="{% static 'js/csrftoken.js' %}"></script>
+<script>
+    const teachers = JSON.parse('{{ teachers | safe }}')
+    const kpkList = JSON.parse('{{ kpk | safe }}')
+
+    new Vue({
+        el: '#app',
+
+        delimiters: ['[[', ']]'],
+
+        data: () => ({
+
+            form: {
+                type: '0',
+                date_from: new Date(),
+                date_to: new Date(),
+                category: null,
+                result: '',
+                student_category: null,
+                student_result: null,
+                teacher: null,
+                kpk: null,
+            },
+
+            resultList,
+            teachers,
+            kpkList,
+
+            subCategoriesView: null,
+        }),
+
+        watch: {
+            'form.category'(value) {
+                if (value) {
+                    this.form.student_category = null
+                    this.form.student_result = null
+                }
+            },
+
+            'form.result'(value) {
+                if (value) {
+                    this.form.student_category = null
+                    this.form.student_result = null
+                }
+            },
+
+            'form.student_category'(value) {
+                if (value) {
+                    this.form.category = null
+                    this.form.result = null
+                }
+            },
+
+            'form.student_result'(value) {
+                if (value) {
+                    this.form.category = null
+                    this.form.result = null
+                }
+            },
+        },
+
+        created() {
+
+        },
+
+        methods: {
+
+        },
+    })
+</script>
+{% endblock scripts %}

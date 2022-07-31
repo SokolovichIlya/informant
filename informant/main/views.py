@@ -69,6 +69,19 @@ class TeacherAddPageView(TemplateView):
 
         return context
 
+class ReportsPageView(TemplateView):
+    template_name = "pages/reports/index.html"
+
+    def get_context_data(self, **kwargs):
+        teachers = User.objects.all().values()
+        kpk = Kpk.objects.filter().values()
+
+        context = {
+            'teachers': json.dumps(list(teachers), default=customDateSerialize),
+            'kpk': json.dumps(list(kpk), default=customDateSerialize),
+        }
+
+        return context
 
 class Student(View):
     def get(self, request):
@@ -238,7 +251,6 @@ class Teacher(View):
                                     city=publications_city, 
                                     page_range=publications_page_range)
 
-
                 fio = request.POST.get('fio')
                 participation_period = request.POST.get('participation_period')
                 mounth = request.POST.get('mounth')
@@ -252,7 +264,6 @@ class Teacher(View):
                 publications  = Publications.objects.get(pk=publications_id.pk)
                 publications_document = request.FILES['documentPublication']
                 
-
                 Teachers.objects.create(fio=fio, participation_period=participation_period, mounth=mounth, 
                                         level=level, category=category,sub_category=sub_category, category_document=category_document, result=result, 
                                         kpk=kpk, kpk_document=kpk_document, publications=publications, 
@@ -268,7 +279,7 @@ class Teacher(View):
     def update(request):
         try:
             if request.user.is_authenticated:
-                teacher_id = request.POST.get('teacher_id')
+                teacher_id = request.POST.get('id')
       
                 publications_name = request.POST.get('publications_name')
                 publications_name_journal = request.POST.get('publications_name_journal')
@@ -286,19 +297,14 @@ class Teacher(View):
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(id=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(id=request.POST.get('sub_category'))
-                category_document = request.FILES['category_document']
                 result  = request.POST.get('result')
                 kpk = Kpk.objects.get(pk=request.POST.get('kpk'))
-                kpk_document = request.FILES['kpk_document']
                 publications  = Publications.objects.get(pk=publications_id.pk)
-                publications_document = request.FILES['publications_document']
                 
 
                 Teachers.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, mounth=mounth, 
-                                        level=level, category=category,sub_category=sub_category, category_document=category_document, result=result, 
-                                        kpk=kpk, kpk_document=kpk_document, publications=publications, 
-                                        publications_document=publications_document)
-
+                                        level=level, category=category,sub_category=sub_category, result=result, 
+                                        kpk=kpk, publications=publications)
 
                 return redirect('/teachers/')
         
@@ -310,12 +316,15 @@ class Teacher(View):
             teacher_id = request.POST.get('id')
 
             teacher = Teachers.objects.get(id=teacher_id)
+
             teacher.delete()
 
-            return HttpResponse(status_code=200)
+            return HttpResponse(status=200)
         
         except Exception as e:
-            return HttpResponse(status=401)
+            print(e)
+            return HttpResponse(status=500)
+
 
 class KpkView(View):
     def post(self, request):
@@ -332,11 +341,49 @@ class KpkView(View):
 
         return JsonResponse(data=json.dumps(list(returnKPK), default=customDateSerialize), safe=False)
 
+    def update(request):
+        kpk_id = request.POST.get('id')
+        kpk_name = request.POST.get('kpk_name') 
+        kpk_city = request.POST.get('kpk_city') or None
+        kpk_organization = request.POST.get('kpk_organization') or None
+        kpk_date_issue = request.POST.get('kpk_date_issue') or None
+        kpk_number_hours = request.POST.get('kpk_number_hours') or None
+
+        Kpk.objects.filter(id=kpk_id).update(name=kpk_name, city=kpk_city, organization=kpk_organization, 
+                            date_issue=kpk_date_issue, number_hours=kpk_number_hours)
+
+        returnKPK = Kpk.objects.filter(id = kpk_id).values()
+
+        return JsonResponse(data=json.dumps(list(returnKPK), default=customDateSerialize), safe=False)
 
 
 class TeacherDetail(View):
     def get(self, request, id):
-        teacher = Teachers.objects.filter(id = id).values()
+        teacher = Teachers.objects.filter(id = id).values(
+            'id',
+            'fio',
+            'participation_period',
+            'mounth',
+            'level',
+            'category',
+            'sub_category',
+            'category_document',
+            'result',
+            'kpk__id',
+            'kpk__name',
+            'kpk__city',
+            'kpk__organization',
+            'kpk__date_issue',
+            'kpk__number_hours',
+            'kpk_document',
+            'publications__id',
+            'publications__name',
+            'publications__name_journal',
+            'publications__city',
+            'publications__page_range',
+            'publications_document',
+        )
+
         categories = Categories.objects.all().values()
         subCategories = SubCategories.objects.all().values()
         kpk = Kpk.objects.filter(default_view = True).values()
@@ -350,7 +397,7 @@ class TeacherDetail(View):
             'publications': json.dumps(list(publications), default=customDateSerialize),
         }
 
-        return render(request, 'pages/students/detail.html', context) 
+        return render(request, 'pages/teachers/detail.html', context) 
 
 
 def login(request):

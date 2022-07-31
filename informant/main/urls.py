@@ -5,7 +5,7 @@ urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
 
     path('teachers/', TeacherPageView.as_view(), name='teachers'),
-    path('teachers/<int:id>/', StudentDetail.as_view(), name='teachers_detail'),
+    path('teachers/<int:id>/', TeacherDetail.as_view(), name='teachers_detail'),
     path('teachers/add/', TeacherAddPageView.as_view(), name='teachers/add'),
     path('teacher/', Teacher.as_view(), name='teacher'),
     path('teacher/update/', Teacher.update, name='teacher_update'),
@@ -25,7 +25,10 @@ urlpatterns = [
     path('download_file_teachesr/', DownloadFile.downloadFileTeachers, name='download_file_teachesr'),
 
     path('kpk/', KpkView.as_view(), name='kpk'),
+    path('kpk/update/', KpkView.update, name='kpk_update'),
 
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
+
+    path('reports/', ReportsPageView.as_view(), name='reports'),    
 ] 
