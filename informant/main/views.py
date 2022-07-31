@@ -235,17 +235,6 @@ class Teacher(View):
                 id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
                 
                 kpk_id  = request.POST.get('kpk')
-                if kpk_id == None:
-                    kpk_name = request.POST.get('kpk_name')
-                    kpk_city = request.POST.get('kpk_city')
-                    kpk_organization = request.POST.get('kpk_organization')
-                    kpk_date_issue = request.POST.get('kpk_date_issue')
-                    kpk_number_hours = request.POST.get('kpk_number_hours')
-
-                    kpk_id = Kpk.objects.create(kpk_name=kpk_name, kpk_city=kpk_city, kpk_organization=kpk_organization, 
-                                        kpk_date_issue=kpk_date_issue, kpk_number_hours=kpk_number_hours)
-                    kpk_id = kpk_id.pk
-
                 publications_name = request.POST.get('publications_name')
                 publications_name_journal = request.POST.get('publications_name_journal')
                 publications_city = request.POST.get('publications_city')
@@ -349,6 +338,21 @@ class Teacher(View):
         
         except Exception as e:
             return HttpResponse(status=401)
+
+class Kpk(View):
+    def post(self, request):
+        kpk_name = request.POST.get('kpk_name')
+        kpk_city = request.POST.get('kpk_city')
+        kpk_organization = request.POST.get('kpk_organization')
+        kpk_date_issue = request.POST.get('kpk_date_issue')
+        kpk_number_hours = request.POST.get('kpk_number_hours')
+
+        kpk = Kpk.objects.create(kpk_name=kpk_name, kpk_city=kpk_city, kpk_organization=kpk_organization, 
+                            kpk_date_issue=kpk_date_issue, kpk_number_hours=kpk_number_hours)
+
+        test=dict(list(kpk))
+        return JsonResponse(data=test, safe=False)
+
 
 
 def login(request):
