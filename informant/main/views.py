@@ -119,8 +119,8 @@ class Student(View):
         try:
             if request.user.is_authenticated:
                 fio = request.POST.get('fio')
-                participation_period = request.POST.get('participation_period')
-                mounth = request.POST.get('mounth')
+                date_from = request.GET.get('date_from') 
+                date_to = request.GET.get('date_to') 
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(pk=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(pk=request.POST.get('sub_category'))
@@ -130,7 +130,7 @@ class Student(View):
                 participation_in_profile_shifts = ProfileShifts.objects.get(pk=request.POST.get('participation_in_profile_shifts'))
                 name_program = request.POST.get('name_program')
 
-                Students.objects.create(fio=fio, participation_period=participation_period, mounth=mounth, level=level, 
+                Students.objects.create(fio=fio, date_from=date_from, date_to=date_to, level=level, 
                                         category=category,sub_category=sub_category, document=document, teacher=teacher, 
                                         result=result, participation_in_profile_shifts=participation_in_profile_shifts, 
                                         name_program=name_program)
@@ -147,8 +147,8 @@ class Student(View):
             if request.user.is_authenticated:
                 student_id = request.POST.get('id')
                 fio = request.POST.get('fio')
-                participation_period = request.POST.get('participation_period')
-                mounth = request.POST.get('mounth')
+                date_from = request.GET.get('date_from') 
+                date_to = request.GET.get('date_to')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(id=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(id=request.POST.get('sub_category'))
@@ -158,8 +158,8 @@ class Student(View):
                 name_program = request.POST.get('name_program')
 
 
-            Students.objects.filter(id=student_id).update(fio=fio, participation_period=participation_period, 
-                                                            mounth=mounth, level=level, category=category, 
+            Students.objects.filter(id=student_id).update(fio=fio, date_from=date_from, date_to=date_to,
+                                                             level=level, category=category, 
                                                             sub_category=sub_category, teacher=teacher,  result=result,
                                                             participation_in_profile_shifts=participation_in_profile_shifts,
                                                             name_program=name_program)
@@ -252,8 +252,8 @@ class Teacher(View):
                                     page_range=publications_page_range)
 
                 fio = request.POST.get('fio')
-                participation_period = request.POST.get('participation_period')
-                mounth = request.POST.get('mounth')
+                date_from = request.GET.get('date_from') 
+                date_to = request.GET.get('date_to')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(pk=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(pk=request.POST.get('sub_category'))
@@ -264,7 +264,7 @@ class Teacher(View):
                 publications  = Publications.objects.get(pk=publications_id.pk)
                 publications_document = request.FILES['documentPublication']
                 
-                Teachers.objects.create(fio=fio, participation_period=participation_period, mounth=mounth, 
+                Teachers.objects.create(fio=fio, date_from=date_from, date_to=date_to,
                                         level=level, category=category,sub_category=sub_category, category_document=category_document, result=result, 
                                         kpk=kpk, kpk_document=kpk_document, publications=publications, 
                                         publications_document=publications_document)
@@ -292,8 +292,8 @@ class Teacher(View):
                                     page_range=publications_page_range)
 
                 fio = request.POST.get('fio')
-                participation_period = request.POST.get('participation_period')
-                mounth = request.POST.get('mounth')
+                date_from = request.GET.get('date_from') 
+                date_to = request.GET.get('date_to')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(id=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(id=request.POST.get('sub_category'))
@@ -302,7 +302,7 @@ class Teacher(View):
                 publications  = Publications.objects.get(pk=publications_id.pk)
                 
 
-                Teachers.objects.filter(id=teacher_id).update(fio=fio, participation_period=participation_period, mounth=mounth, 
+                Teachers.objects.filter(id=teacher_id).update(fio=fio, date_from=date_from, date_to=date_to, 
                                         level=level, category=category,sub_category=sub_category, result=result, 
                                         kpk=kpk, publications=publications)
 
@@ -427,26 +427,27 @@ def logout(request):
 
 class ExportToExcel(View):
     def exportToExcelStudents(request):
-        # на вход фильтры по категории, временнной период, результативность
+        # на вход фильтры по период времени,   категории, результативность
 
         filters = {}
+
+        date_from = request.GET.get('date_from') 
+        if date_from != None:
+            filters['date_from'] = date_from
+        
+        date_to = request.GET.get('date_to') 
+        if date_to != None:
+            filters['date_to'] = date_to
 
         category = request.GET.get('category') 
         if category != None:
             filters['category'] = category
-        mounth = request.GET.get('mounth') 
-        if mounth != None: 
-            mounth = int(mounth)
-            filters['mounth'] = mounth
-        participation_period = request.GET.get('participation_period') 
-        if participation_period != None:
-            filters['participation_period'] = participation_period
+
         result = request.GET.get('result') 
         if result != None: 
             result = int(result)
             filters['result'] = result
 
-        
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="students.xls"'
 
@@ -469,12 +470,8 @@ class ExportToExcel(View):
         font_style = xlwt.XFStyle()
 
 
-        if len(filters) != 0:
-            rows = Students.objects.filter(**filters).values_list('fio', 'participation_period', 'mounth',
-                                        'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
-                                        'name_program').order_by(Lower('fio'))
-        else:
-            rows = Students.objects.all().values_list('fio', 'participation_period', 'mounth',
+
+        rows = Students.objects.filter(**filters).values_list('fio', 'participation_period', 'mounth',
                                         'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
                                         'name_program').order_by(Lower('fio'))
 
@@ -513,32 +510,51 @@ class ExportToExcel(View):
     def exportToExcelTeachers(request):
         # на вход фильтры по категории, временнной период, результативность
         filters = {}
+        filters_student = {}
+
+        fio = request.GET.get('fio') 
+        if fio != None:
+            filters['fio'] = fio    
+            filters_student['teacher'] = fio    
+
+        date_from = request.GET.get('date_from') 
+        if date_from != None:
+            filters['date_from'] = date_from
+        
+        date_to = request.GET.get('date_to') 
+        if date_to != None:
+            filters['date_to'] = date_to
 
         category = request.GET.get('category') 
-        if category != None:
+        kpk = request.GET.get('kpk') 
+
+        if category == 'kpk':
+            if kpk != None:
+                filters['kpk'] = kpk
+            else:
+                filters['category'] = category
+        elif category != None:
             filters['category'] = category
-        mounth = request.GET.get('mounth') 
-        if mounth != None: 
-            mounth = int(mounth)
-            filters['mounth'] = mounth
+
         result = request.GET.get('result') 
         if result != None: 
             result = int(result)
             filters['result'] = result
-        kpk = request.GET.get('kpk') 
-        if kpk != None:
-            filters['kpk'] = kpk
-        publications = request.GET.get('publications') 
-        if publications != None:
-            filters['publications'] = publications
 
-        
+        student_category = request.GET.get('student_category') 
+        if student_category != None: 
+            filters_student['category'] = student_category
+
+        student_result = request.GET.get('student_result') 
+        if student_result != None: 
+            student_result = int(student_result)
+            filters_student['result'] = student_result
+
         
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="teachers.xls"'
 
         wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet('Информация об учителях')
 
         # Sheet header, first row
         row_num = 0
@@ -546,45 +562,83 @@ class ExportToExcel(View):
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
 
-        columns = ['ФИО', 'Период участия', 'Месяц', 'Уровень', 'Категория',
-                    'Результат', 'КПК', 'Публикации']
+        if student_category or student_result:
+            ws = wb.add_sheet(fio)
 
-        for col_num in range(len(columns)):
-            ws.write(row_num, col_num, columns[col_num], font_style)
+            columns = ['ФИО', 'Дата с', 'Дата по', 'Уровень', 'Категория', 'Учитель', 
+                    'Результат', 'Участие в профильных сменах', 'Название программы']
 
-        # Sheet body, remaining rows
-        font_style = xlwt.XFStyle()
+            for col_num in range(len(columns)):
+                ws.write(row_num, col_num, columns[col_num], font_style)
 
-        if len(filters) != 0:
-            rows = Teachers.objects.filter(**filters).values_list('fio', 'participation_period', 'mounth',
-                                        'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
+            # Sheet body, remaining rows
+            font_style = xlwt.XFStyle()
+
+            rows = Students.objects.filter(**filters).values_list('fio', 'date_from', 'date_to',
+                                            'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
+                                            'name_program').order_by(Lower('fio'))
+
+            for row in rows:
+                row = list(row)
+
+                for mounth in Mounth():
+                    if mounth[0] == row[2]:
+                        row[2] = mounth[1]
+
+                for level in Level():
+                    if level[0] == row[3]:
+                        row[3] = level[1]
+
+                row[4] = Categories.objects.get(pk=row[4]).name
+                row[5] = User.objects.get(pk=row[5]).username
+
+                for result in Result():
+                    if result[0] == row[6]:
+                        row[6] = result[1]
+
+                row[7]= ProfileShifts.objects.get(pk=row[7]).name
+
+                row_num += 1
+                for col_num in range(len(row)):
+                    ws.write(row_num, col_num, row[col_num], font_style)
+            
         else:
-            rows = Teachers.objects.all().values_list('fio', 'participation_period', 'mounth',
-                                        'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
+            ws = wb.add_sheet(f'Информация об учителях')
 
-        for row in rows:
-            row = list(row)
+            columns = ['ФИО', 'Дата с', 'Дата по', 'Уровень', 'Категория',
+                        'Результат', 'КПК', 'Публикации']
 
-            for mounth in Mounth():
-                if mounth[0] == row[2]:
-                    row[2] = mounth[1]
+            for col_num in range(len(columns)):
+                ws.write(row_num, col_num, columns[col_num], font_style)
 
-            for level in Level():
-                if level[0] == row[3]:
-                    row[3] = level[1]
+            # Sheet body, remaining rows
+            font_style = xlwt.XFStyle()
 
-            row[4] = Categories.objects.get(pk=row[4]).name
-            row[5] = Kpk.objects.get(pk=row[4]).name
-            row[6]= Publications.objects.get(pk=row[7]).name
+            rows = Teachers.objects.filter(**filters).values_list('fio', 'date_from', 'date_to',
+                                            'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
+            
+            for row in rows:
+                row = list(row)
 
-            row_num += 1
-            for col_num in range(len(row)):
-                ws.write(row_num, col_num, row[col_num], font_style)
-        
+                for mounth in Mounth():
+                    if mounth[0] == row[2]:
+                        row[2] = mounth[1]
+
+                for level in Level():
+                    if level[0] == row[3]:
+                        row[3] = level[1]
+
+                row[4] = Categories.objects.get(pk=row[4]).name
+                row[5] = Kpk.objects.get(pk=row[4]).name
+                row[6]= Publications.objects.get(pk=row[7]).name
+
+                row_num += 1
+                for col_num in range(len(row)):
+                    ws.write(row_num, col_num, row[col_num], font_style)
+            
 
         wb.save(response)
         return response
-
 
 class DownloadFile(View):
     def downloadFileStudents(request):
