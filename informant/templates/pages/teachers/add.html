@@ -7,151 +7,355 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
-<div class="wrapper-content">
+<div class="wrapper-content" id="app">
     <div class="page">
         <div class="page-body page-block">
-            <form enctype="multipart/form-data" action="/student/" method="POST" class="form">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="id_fio">ФИО:</label>
-                    <input type="text" name="fio" maxlength="150" required="" id="id_fio">
-                </div>
-                <div class="form-group">
-                    <label for="id_participation_period">Период участия:</label>
-                    <input type="text" name="participation_period" maxlength="250" required="" id="id_participation_period">
-                </div>
-                <div class="form-group">
-                    <label for="id_mounth">Месяц:</label>
-                    <select name="mounth" id="id_mounth">
-                        <option value="0" selected="">Январь</option>
-                        <option value="1">Февраль</option>
-                        <option value="2">Март</option>
-                        <option value="3">Апрель</option>
-                        <option value="4">Май</option>
-                        <option value="5">Июнь</option>
-                        <option value="6">Июль</option>
-                        <option value="7">Август</option>
-                        <option value="8">Сентябрь</option>
-                        <option value="9">Октябрь</option>
-                        <option value="10">Ноябрь</option>
-                        <option value="11">Декабрь</option>
-                    </select>   
-                </div>
-                <div class="form-group">
-                    <label for="id_level">Уровень:</label>
-                    <select name="level" id="id_level">
-                        <option value="0" selected="">Муниципальный</option>
-                        <option value="1">Региональный</option>
-                        <option value="2">Федеральный</option>
-                    </select>    
-                </div>  
-                <div class="form-group">
-                    <label for="id_category">Категория:</label>
-                    <select name="category" id="id_category">
-                        {% for category in categories %}
-                        <optgroup label="{{ category.name }}">
-                            {% for subCategory in subCategories %}
-                                {% if subCategory.category == category %}
-                                    <option>{{ subCategory.name }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                    </select>   
-                </div>  
-                <div class="form-group">
-                    <label for="id_document">Подтверждающий документ категории:</label>
-                    <input type="file" name="document" required="" id="id_document">
-                </div>                
-                <div class="form-group">
-                    <label for="id_result">Результат:</label>
-                    <select name="result" id="id_result">
-                        <option value="0">Победитель</option>
-                        <option value="1">Призер</option>
-                        <option value="2" selected="">Участник</option>
-                    </select> 
-                </div>   
-                <div class="form-group">
-                    <label for="kpk">КПК:</label>
-                    <select name="kpk" id="kpk">
-                        {% for kpk_item in kpk %}
-                            <option value="{{ kpk_item.id }}">{{ kpk_item.name }}</option>
-                        {% endfor %}
-                    </select>    
-                </div>   
-                <div id="kpkGroup">
-                    <div class="form-group">
-                        <label for="kpk_name">Название курсов в соответствии с удостоверением:</label>
-                        <input type="text" name="kpk_name" maxlength="250" id="kpk_name">
-                    </div>
-                    <div class="form-group">
-                        <label for="kpk_city">Город:</label>
-                        <input type="text" name="kpk_city" maxlength="250" id="kpk_city">
-                    </div>
-                    <div class="form-group">
-                        <label for="kpk_organization">Организация в соответствии с удостоверением:</label>
-                        <input type="text" name="kpk_organization" maxlength="250" id="kpk_organization">
-                    </div>
-                    <div class="form-group">
-                        <label for="kpk_date_issue">Дата выдачи в форматие ДД.ММ.ГГ:</label>
-                        <input type="text" name="kpk_date_issue" maxlength="250" id="kpk_date_issue">
-                    </div>
-                    <div class="form-group">
-                        <label for="kpk_number_hours">Количество часов:</label>
-                        <input type="text" name="kpk_number_hours" maxlength="250" id="kpk_number_hours">
-                    </div>                    
-                </div>
-                <div class="form-group">
-                    <label for="kpk_document">Подтверждающий документ КПК:</label>
-                    <input type="file" name="kpk_document" required="" id="kpk_document">
-                </div>     
-                <div class="form-group">
-                    <label for="publications_name">Название публикации:</label>
-                    <input type="text" name="publications_name" maxlength="250" required="" id="publications_name">
-                </div>
-                <div class="form-group">
-                    <label for="publications_name_journal">Название журнала / сборника:</label>
-                    <input type="text" name="publications_name_journal" maxlength="250" required="" id="publications_name_journal">
-                </div>
-                <div class="form-group">
-                    <label for="publications_city">Город издательства:</label>
-                    <input type="text" name="publications_city" maxlength="250" required="" id="publications_city">
-                </div>
-                <div class="form-group">
-                    <label for="publications_page_range">Диапазон страниц:</label>
-                    <input type="text" name="publications_page_range" maxlength="250" required="" id="publications_page_range">
-                </div>
-                <div class="form-group">
-                    <label for="publications_document">Подтверждающий документ публикация:</label>
-                    <input type="file" name="publications_document" required="" id="publications_document">
-                </div>                                       
-                <button class="button">Сохранить</button>
-                <a href="/students/" class="button">Назад</a>
-            </form>
+            <el-form :model="teacher" :rules="rules" label-position="left" ref="teacher" label-width="300px">
+                <el-form-item label="ФИО" prop="fio">
+                    <el-input v-model="teacher.fio" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Период участия" prop="participation_period">
+                    <el-input v-model="teacher.participation_period" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Месяц участия" prop="mounth">
+                    <el-select class="w-100" v-model="teacher.mounth" placeholder="">
+                        <el-option v-for="item in mounthList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Уровень" prop="level">
+                    <el-select class="w-100" v-model="teacher.level" placeholder="">
+                        <el-option v-for="item in levelList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Категория" prop="category">
+                    <el-select class="w-100" v-model="teacher.category" placeholder="">
+                            <el-option 
+                                v-for="category in categories" 
+                                :label="category.name" 
+                                :value="category.id"
+                            ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Подкатегория" prop="sub_category">
+                    <el-select class="w-100" v-model="teacher.sub_category" placeholder="">
+                            <el-option 
+                                v-for="subCategory in subCategoriesView" 
+                                :label="subCategory.name" 
+                                :value="subCategory.id"
+                            ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Подтверждающий документ" prop="document">
+                    <el-upload
+                        v-model="teacher.document"
+                        :auto-upload="false"
+                        :multiple="false" 
+                        :limit="1" 
+                        action=""
+                        ref="uploadDocument"
+                    >
+                        <el-button size="small" type="primary">Нажмите для загрузки</el-button>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="Результат" prop="result">
+                    <el-select class="w-100" v-model="teacher.result" placeholder="">
+                        <el-option v-for="item in resultList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="КПК" prop="kpk">
+                    <el-select class="w-100" v-model="teacher.kpk" placeholder="">
+                            <el-option 
+                                v-for="item in kpkList" 
+                                :label="item.name" 
+                                :value="item.id"
+                            ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Подтверждающий документ КПК" prop="kpk_document">
+                    <el-upload
+                        :auto-upload="false"
+                        :multiple="false" 
+                        :limit="1" 
+                        action=""
+                        ref="uploadDocumentKPK"
+                    >
+                        <el-button size="small" type="primary">Нажмите для загрузки</el-button>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="Название публикации" prop="publications_name">
+                    <el-input v-model="teacher.publications_name" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Название журнала / сборника" prop="publications_name_journal">
+                    <el-input v-model="teacher.publications_name_journal" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Город издательства" prop="publications_city">
+                    <el-input v-model="teacher.publications_city" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Диапазон страниц" prop="publications_page_range">
+                    <el-input v-model="teacher.publications_page_range" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Подтверждающий документ публикации" prop="publications_document">
+                    <el-upload
+                        :auto-upload="false"
+                        :multiple="false" 
+                        :limit="1" 
+                        action=""
+                        ref="uploadDocumentPublications"
+                    >
+                        <el-button size="small" type="primary">Нажмите для загрузки</el-button>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('teacher')">Сохранить</el-button>
+                    <el-button @click="resetForm('teacher')">Сбросить</el-button>
+                    <el-button @click="backList()">Назад</el-button>
+                </el-form-item>
+            </el-form>
         </div>
     </div>
+
+    <el-dialog
+        title="Иной КПК"
+        :visible.sync="dialogVisible"
+        width="500px"
+        :close-on-click-modal="false"
+    >
+        <el-form :model="kpkForm" :rules="kpkRules" label-position="top" ref="kpkForm" label-width="200px" size="small">
+            <el-form-item label="Название курсов в соответствии с удостоверением" prop="kpk_name">
+                <el-input v-model="kpkForm.kpk_name" placeholder=""></el-input>
+            </el-form-item>
+            <el-form-item label="Город" prop="kpk_city">
+                <el-input v-model="kpkForm.kpk_city" placeholder=""></el-input>
+            </el-form-item>
+            <el-form-item label="Организация в соответствии с удостоверением" prop="kpk_organization">
+                <el-input v-model="kpkForm.kpk_organization" placeholder=""></el-input>
+            </el-form-item>
+            <el-form-item label="Дата выдачи в форматие ДД.ММ.ГГ" prop="kpk_date_issue">
+                <el-input v-model="kpkForm.kpk_date_issue" placeholder=""></el-input>
+            </el-form-item>
+            <el-form-item label="Количество часов" prop="kpk_number_hours">
+                <el-input v-model="kpkForm.kpk_number_hours" placeholder=""></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="cancelCreateKPK">Отмена</el-button>
+            <el-button type="primary" @click="dialogVisible = false">Сохранить</el-button>
+        </span>
+    </el-dialog>
+
 </div>
 {% endblock main %}
 
 {% block scripts %}
+<script src="{% static 'js/config.js' %}"></script>
+<script src="{% static 'js/csrftoken.js' %}"></script>
 <script>
-$("document").ready(() => {
-    checkKPKSelect()
-})
+    const subCategories = JSON.parse('{{ subCategories | safe }}')
+    const categories = JSON.parse('{{ categories | safe }}')
+    const publications = JSON.parse('{{ publications | safe }}')
+    const kpkList = JSON.parse('{{ kpk | safe }}')
 
-$('#kpk').change((item) => {
-    checkKPKSelect()
-})
+    new Vue({
+        el: '#app',
 
-function checkKPKSelect() {
-    if ($('#kpk option:selected').text() === 'Иное') {
-        $('#kpkGroup').show()
+        delimiters: ['[[', ']]'],
 
-        return
-    }
+        data: () => ({
+            isLoading: false,
+            dialogVisible: false,
 
-    $('#kpkGroup').hide()       
-}
+            teacher: {
+                fio: '',
+                participation_period: '',
+                mounth: '',
+                level: '',
+                category: '',
+                sub_category: '',
+                document: '',
+                result: '',
+                kpk: '',
+                kpk_document: '',
+                publications_name: '',
+                publications_name_journal: '',
+                publications_city: '',
+                publications_page_range: '',
+                publications_document: '',
+            },
 
+            kpkForm: {
+                kpk_name: '',
+                kpk_city: '',
+                kpk_organization: '',
+                kpk_date_issue: '',
+                kpk_number_hours: '',
+            },
+
+            rules: {
+                fio: [
+                    { required: true, message: 'Пожалуйста, укажите ФИО', trigger: 'blur' }
+                ],
+                participation_period: [
+                    { required: true, message: 'Пожалуйста, укажите Период участия', trigger: 'blur' }
+                ],
+                mounth: [
+                    { required: true, message: 'Пожалуйста, выберите Месяц', trigger: 'change' }
+                ],
+                level: [
+                    { required: true, message: 'Пожалуйста, выберите Уровень', trigger: 'change' }
+                ],
+                category: [
+                    { required: true, message: 'Пожалуйста, выберите Категорию', trigger: 'change' }
+                ],
+                sub_category: [
+                    { required: true, message: 'Пожалуйста, выберите Подкатегорию', trigger: 'change' }
+                ],
+                document: [
+                    { required: false, message: 'Пожалуйста, прикрепите Документ', trigger: 'change' }
+                ],
+                result: [
+                    { required: true, message: 'Пожалуйста, выберите Результат', trigger: 'change' }
+                ],
+                kpk: [
+                    { required: true, message: 'Пожалуйста, выберите КПК', trigger: 'change' }
+                ],
+                kpk_document: [
+                    { required: false, message: 'Пожалуйста, прикрепите Документ КПК', trigger: 'change' }
+                ],
+                publications_name: [
+                    { required: true, message: 'Пожалуйста, укажите Название публикации', trigger: 'blur' }
+                ],
+                publications_name_journal: [
+                    { required: true, message: 'Пожалуйста, укажите Название журнала / сборника', trigger: 'blur' }
+                ],
+                publications_city: [
+                    { required: true, message: 'Пожалуйста, укажите Город издательства', trigger: 'blur' }
+                ],
+                publications_page_range: [
+                    { required: true, message: 'Пожалуйста, укажите Подтверждающий документ публикация', trigger: 'blur' }
+                ],
+                publications_document: [
+                    { required: false, message: 'Пожалуйста, прикрепите Документ', trigger: 'change' }
+                ],
+            },
+
+            kpkRules: {
+                kpk_name: [
+                    { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
+                ],
+                kpk_city: [
+                    { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
+                ],
+                kpk_organization: [
+                    { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
+                ],
+                kpk_date_issue: [
+                    { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
+                ],
+                kpk_number_hours: [
+                    { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
+                ],
+            },
+            
+            mounthList,
+            levelList,
+            resultList,
+            subCategories,
+            categories,
+            publications,
+            kpkList,
+
+            subCategoriesView: null,
+        }),
+
+        watch: {
+            'teacher.kpk'(value) {
+                let kpkItem = this.kpkList.find(item => item.id === value)
+
+                if (kpkItem.name === 'Иное') {
+                    this.dialogVisible = true
+                }
+            },
+
+            'teacher.category'(value) {
+                this.subCategoriesView = this.subCategories.filter(item => item.category_id === value)
+            },
+        },
+
+        methods: {
+            async submitForm(formName) {
+                await this.$refs[formName].validate(async (valid) => {
+                    if (valid) {
+
+                        let checkDocCat = this.$refs.uploadDocument.uploadFiles.length > 0
+                        let checkDocKPK = this.$refs.uploadDocumentKPK.uploadFiles.length > 0
+                        let checkDocPub = this.$refs.uploadDocumentPublications.uploadFiles.length > 0
+
+                        if (!checkDocCat || !checkDocKPK || !checkDocPub) {
+                            this.$message.error('Прикрепите все необходимые документы')
+
+                            return
+                        }
+
+                        let form = new FormData()
+
+                        for ( var key in this.teacher ) {
+                            form.append(key, this.teacher[key]);
+                        }
+
+                        form.append("document", this.$refs.uploadDocument.uploadFiles[0].raw);
+                        form.append("documentKpk", this.$refs.uploadDocumentKPK.uploadFiles[0].raw);
+                        form.append("documentPublication", this.$refs.uploadDocumentPublications.uploadFiles[0].raw);
+
+                        try {
+                            const { data } = await axios.post('/teacher/', form, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+
+                            this.backList()
+
+                        } catch (error) {
+                            console.error(error)
+                            this.$message.error(error.message)
+                        }
+
+                    } else {
+                        return false;
+                    }
+                });
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            backList() {
+                window.location.replace('/teachers/')
+            },
+
+            async createKPK(formName) {
+                await this.$refs[formName].validate(async (valid) => {
+                    if (valid) {
+                        
+                    }
+                })
+            },
+
+            cancelCreateKPK() {
+                this.kpkForm = {
+                    kpk_name: '',
+                    kpk_city: '',
+                    kpk_organization: '',
+                    kpk_date_issue: '',
+                    kpk_number_hours: '',
+                }
+
+                this.teacher.kpk = null
+
+                this.dialogVisible = false
+            },
+        },
+    })
 </script>
 {% endblock scripts %}

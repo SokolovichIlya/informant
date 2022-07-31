@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'libs/datepicker/air-datepicker.css' %}">
     <link rel="stylesheet" href="{% static 'css/index.min.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <title>Информант</title>
     {% block meta %}{% endblock %}
 </head>
@@ -29,10 +30,23 @@
         {% block main %}{% endblock main %}
     </main>  
 
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="//unpkg.com/element-ui/lib/umd/locale/ru-RU.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/datepicker.js' %}"></script>
     <script src="{% static 'js/moment.js' %}"></script>
     <script src="{% static 'js/index.js' %}"></script>
+    <script src="{% static 'js/services.js' %}"></script>
+
+    <script>
+        axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+        axios.defaults.xsrfCookieName = "csrftoken"
+
+        ELEMENT.locale(ELEMENT.lang.ruRU)
+    </script>
 
     {% block scripts %}{% endblock scripts %}
 </body>

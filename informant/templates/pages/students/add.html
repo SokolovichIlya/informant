@@ -7,103 +7,210 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
-<div class="wrapper-content">
+<div class="wrapper-content" id="app">
     <div class="page">
         <div class="page-body page-block">
-            <form enctype="multipart/form-data" action="/student/" method="POST" class="form">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="id_fio">ФИО:</label>
-                    <input type="text" name="fio" maxlength="150" required="" id="id_fio">
-                </div>
-                <div class="form-group">
-                    <label for="id_participation_period">Период участия:</label>
-                    <input type="text" name="participation_period" maxlength="250" required="" id="id_participation_period">
-                </div>
-                <div class="form-group">
-                    <label for="id_mounth">Месяц:</label>
-                    <select name="mounth" id="id_mounth">
-                        <option value="0" selected="">Январь</option>
-                        <option value="1">Февраль</option>
-                        <option value="2">Март</option>
-                        <option value="3">Апрель</option>
-                        <option value="4">Май</option>
-                        <option value="5">Июнь</option>
-                        <option value="6">Июль</option>
-                        <option value="7">Август</option>
-                        <option value="8">Сентябрь</option>
-                        <option value="9">Октябрь</option>
-                        <option value="10">Ноябрь</option>
-                        <option value="11">Декабрь</option>
-                    </select>   
-                </div>
-                <div class="form-group">
-                    <label for="id_level">Уровень:</label>
-                    <select name="level" id="id_level">
-                        <option value="0" selected="">Муниципальный</option>
-                        <option value="1">Региональный</option>
-                        <option value="2">Федеральный</option>
-                    </select>    
-                </div>  
-                <div class="form-group">
-                    <label for="id_category">Категория:</label>
-                    <select name="category" id="id_category">
-                        <option value="" selected="">---------</option>
-                        {% for category in categories %}
-                        <optgroup label="{{ category.name }}">
-                            {% for subCategory in subCategories %}
-                                {% if subCategory.category == category %}
-                                    <option>{{ subCategory.name }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                    </select>   
-                </div>  
-                <div class="form-group">
-                    <label for="id_document">Подтверждающий документ:</label>
-                    <input type="file" name="document" required="" id="id_document">
-                </div>                
-                <div class="form-group">
-                    <label for="id_teacher">Учитель-наставник:</label>
-                    <select name="teacher" id="id_teacher">
-                        <option value="" selected="">---------</option>
-                        {% for teacher in teachers %}
-                        <option value="{{ teacher.id }}" selected="">{{ teacher.last_name }} {{ teacher.first_name }}</option>
-                        {% endfor %}
-                    </select> 
-                </div>  
-                <div class="form-group">
-                    <label for="id_result">Результат:</label>
-                    <select name="result" id="id_result">
-                        <option value="0">Победитель</option>
-                        <option value="1">Призер</option>
-                        <option value="2" selected="">Участник</option>
-                    </select> 
-                </div>                
-                <div class="form-group">
-                    <label for="id_participation_in_profile_shifts">Участие в профильных сменах:</label>
-                    <select name="participation_in_profile_shifts" id="id_participation_in_profile_shifts">
-                        <option value="" selected="">---------</option>
-                        {% for profile in profileShifts %}
-                        <option value="{{ profile.id }}" selected="">{{ profile.name }}</option>
-                        {% endfor %}
-                    </select>   
-                </div>             
-                <div class="form-group">
-                    <label for="id_name_program">Название программы:</label>
-                    <input type="text" name="name_program" maxlength="1000" required="" id="id_name_program">
-                </div>
-                <button class="button">Сохранить</button>
-                <a href="/students/" class="button">Назад</a>
-            </form>
+            <el-form :model="student" :rules="rules" label-position="left" ref="student" label-width="300px">
+                <el-form-item label="ФИО" prop="fio">
+                    <el-input v-model="student.fio" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Период участия" prop="participation_period">
+                    <el-input v-model="student.participation_period" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Месяц участия" prop="mounth">
+                    <el-select class="w-100" v-model="student.mounth" placeholder="">
+                        <el-option v-for="item in mounthList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Уровень" prop="level">
+                    <el-select class="w-100" v-model="student.level" placeholder="">
+                        <el-option v-for="item in levelList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Категория" prop="category">
+                    <el-select class="w-100" v-model="student.category" placeholder="">
+                        <el-option v-for="item in categories" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Подкатегория" prop="sub_category">
+                    <el-select class="w-100" v-model="student.sub_category" placeholder="">
+                        <el-option v-for="item in subCategoriesView" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Подтверждающий документ" prop="document">
+                    <el-upload
+                        v-model="student.document"
+                        :auto-upload="false"
+                        :multiple="false" 
+                        :limit="1" 
+                        action=""
+                        ref="uploadDocument"
+                    >
+                        <el-button size="small" type="primary">Нажмите для загрузки</el-button>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="Учитель-наставник" prop="teacher">
+                    <el-select class="w-100" v-model="student.teacher" placeholder="">
+                        <el-option v-for="item in teachers" :label="`${item.last_name} ${item.first_name}`" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Результат" prop="result">
+                    <el-select class="w-100" v-model="student.result" placeholder="">
+                        <el-option v-for="item in resultList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Участие в профильных сменах" prop="participation_in_profile_shifts">
+                    <el-select class="w-100" v-model="student.participation_in_profile_shifts" placeholder="">
+                        <el-option v-for="item in profileShifts" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Название программы" prop="name_program">
+                    <el-input v-model="student.name_program" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('student')">Сохранить</el-button>
+                    <el-button @click="resetForm('student')">Сбросить</el-button>
+                    <el-button @click="backList()">Назад</el-button>
+                </el-form-item>
+            </el-form>
         </div>
     </div>
 </div>
 {% endblock main %}
 
 {% block scripts %}
+<script src="{% static 'js/config.js' %}"></script>
+<script src="{% static 'js/csrftoken.js' %}"></script>
 <script>
+    const teachers = JSON.parse('{{ teachers | safe }}')
+    const subCategories = JSON.parse('{{ subCategories | safe }}')
+    const categories = JSON.parse('{{ categories | safe }}')
+    const profileShifts = JSON.parse('{{ profileShifts | safe }}')
 
+    new Vue({
+        el: '#app',
+
+        delimiters: ['[[', ']]'],
+
+        data: () => ({
+            isLoading: false,
+
+            student: {
+                fio: '',
+                participation_period: '',
+                mounth: '',
+                level: '',
+                category: '',
+                sub_category: '',
+                document: '',
+                teacher: '',
+                result: '',
+                participation_in_profile_shifts: '',
+                name_program: '',
+            },
+
+            rules: {
+                fio: [
+                    { required: true, message: 'Пожалуйста, укажите ФИО', trigger: 'blur' }
+                ],
+                participation_period: [
+                    { required: true, message: 'Пожалуйста, укажите Период участия', trigger: 'blur' }
+                ],
+                mounth: [
+                    { required: true, message: 'Пожалуйста, выберите Месяц', trigger: 'change' }
+                ],
+                level: [
+                    { required: true, message: 'Пожалуйста, выберите Уровень', trigger: 'change' }
+                ],
+                category: [
+                    { required: true, message: 'Пожалуйста, выберите Категорию', trigger: 'change' }
+                ],
+                sub_category: [
+                    { required: true, message: 'Пожалуйста, выберите Подкатегорию', trigger: 'change' }
+                ],
+                document: [
+                    { required: false, message: 'Пожалуйста, прикрепите Документ', trigger: 'change' }
+                ],
+                teacher: [
+                    { required: true, message: 'Пожалуйста, укажите Учителя-наставника', trigger: 'blur' }
+                ],
+                result: [
+                    { required: true, message: 'Пожалуйста, выберите Результат', trigger: 'change' }
+                ],
+                participation_in_profile_shifts: [
+                    { required: true, message: 'Пожалуйста, выберите Участие в профильных сменах', trigger: 'change' }
+                ],
+                name_program: [
+                    { required: true, message: 'Пожалуйста, укажите Название программы', trigger: 'blur' }
+                ],
+            },
+
+            mounthList,
+            levelList,
+            resultList,
+            teachers,
+            subCategories,
+            categories,
+            profileShifts,
+
+            subCategoriesView: null,
+        }),
+
+        watch: {
+            'student.category'(value) {
+                this.subCategoriesView = this.subCategories.filter(item => item.category_id === value)
+            },
+        },
+
+        methods: {
+            async submitForm(formName) {
+                await this.$refs[formName].validate(async (valid) => {
+                    if (valid) {
+
+                        let checkDocCat = this.$refs.uploadDocument.uploadFiles.length > 0
+
+                        if (!checkDocCat) {
+                            this.$message.error('Прикрепите все необходимые документы')
+
+                            return
+                        }
+
+                        let form = new FormData()
+
+                        for ( var key in this.student ) {
+                            form.append(key, this.student[key]);
+                        }
+
+                        form.append("document", this.$refs.uploadDocument.uploadFiles[0].raw);
+
+                        try {
+                            const { data } = await axios.post('/student/', form, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+
+                            this.backList()
+
+                        } catch (error) {
+                            console.error(error);
+                            this.$message.error(error.message);
+                        }
+
+                    } else {
+                        return false;
+                    }
+                });
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            backList() {
+                window.location.replace('/students/')
+            },
+        },
+    })
 </script>
 {% endblock scripts %}

@@ -1,0 +1,80 @@
+const mounthList = [
+    {
+        value: "0",
+        label: 'Январь'
+    },
+    {
+        value: "1",
+        label: 'Февраль'
+    },
+    {
+        value: "2",
+        label: 'Март'
+    },
+    {
+        value: "3",
+        label: 'Апрель'
+    },
+    {
+        value: "4",
+        label: 'Май'
+    },
+    {
+        value: "5",
+        label: 'Июнь'
+    },
+    {
+        value: "6",
+        label: 'Июль'
+    },
+    {
+        value: "7",
+        label: 'Август'
+    },
+    {
+        value: "8",
+        label: 'Сентябрь'
+    },
+    {
+        value: "9",
+        label: 'Октябрь'
+    },
+    {
+        value: "10",
+        label: 'Ноябрь'
+    },
+    {
+        value: "11",
+        label: 'Декабрь'
+    },
+]
+
+const levelList = [
+    {
+        value: "0",
+        label: 'Муниципальный',
+    },
+    {
+        value: "1",
+        label: 'Региональный',
+    },
+    {
+        value: "2",
+        label: 'Федеральный',
+    },
+]
+
+const resultList = [
+    {
+        value: "0",
+        label: 'Победитель',
+    },
+    {
+        value: "1",
+        label: 'Призер',
+    },
+    {
+        value: "2",
+        label: 'Участник',
+    },    
+]

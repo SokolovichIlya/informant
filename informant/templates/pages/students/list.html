@@ -6,46 +6,135 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
-<div class="wrapper-content">
+<div class="wrapper-content" id="app">
     <div class="page">
         <div class="page-header page-block">
             <div class="flex flex-content-between flex-align-center">
-                <form action="">
-                    <input type="search" name="" id="" class="search">
-                    <button type="button" class="button">Поиск</button>
+                <form action="" class="flex flex-align-center flex-gap-5">
+                    <el-input placeholder="Поиск..." v-model="form.fio"></el-input>
+                    <el-button @click="getData" icon="el-icon-search" circle></el-button>
                 </form>
-                <a href="/students/add" class="button">Добавить запись</a>
+                <a href="/students/add"><el-button>Добавить запись</el-button></a>
             </div>
         </div>
-        <div class="page-body page-block">
-            {% include 'components/global/tableStudents.html' %}
-            {% include 'components/global/paginations.html' %}
+        <div v-if="isLoading" class="page-body page-block">
+            <el-table
+                :data="students.data"
+                style="width: 100%"
+            >
+                <el-table-column
+                    prop="fio"
+                    label="ФИО"
+                >
+                </el-table-column>
+                <el-table-column
+                    prop="participation_period"
+                    label="Период участия"
+                >
+                </el-table-column>
+                <el-table-column width="140">
+                    <template slot-scope="scope">
+                        <el-button
+                            size="mini"
+                            @click="handleEdit(scope.$index, scope.row)"><i class="el-icon-edit"></i></el-button>
+                        <el-popover
+                            placement="bottom"
+                            title="Подтверждение удаления"
+                            width="200"
+                            trigger="click"
+                        >
+                            <p>Удалить запись?</p>
+                            <div class="margin-top">
+                                <el-button
+                                    size="mini"
+                                    @click="handleDelete(scope.$index, scope.row)"
+                                >
+                                    Удалить
+                                </el-button>
+                            </div>
+
+                            <el-button size="mini" type="danger" slot="reference"><i class="el-icon-delete"></i></el-button>
+                        </el-popover>
+                    </template>
+                </el-table-column>
+            </el-table> 
+            <div class="margin-top">
+                <el-pagination
+                    @current-change="getData"
+                    :total="students.total"
+                    :current-page="getCurrentPage"
+                    background
+                    layout="prev, pager, next"
+                >
+                </el-pagination>   
+            </div>
         </div>
     </div>
 </div>
 {% endblock main %}
 
 {% block scripts %}
-<script src="{% static 'js/table.js' %}"></script>
-
 <script>
-$.ajax({
-	url: '/student', 
-	method: 'get',            
-	data: {
-        page: 1,
-    },    
-	success: function(data) { 
+    new Vue({
+        el: '#app',
 
-        let keys = {
-            'fio': 'ФИО',
-            'participation_period': 'Период участия',
-        }
+        delimiters: ['[[', ']]'],
 
-        let url = 'students'
+        data: () => ({
+            isLoading: false,
 
-        init(data, keys, url)         
-	}
-});
+            students: null,
+
+            form: {
+                fio: '',
+            },
+        }),
+
+        computed: {
+            getCurrentPage() {
+                return Number(this.students.page)
+            },
+        },
+
+        created() {
+            this.getData()
+        },
+
+        methods: {
+            async getData(page = 1) {
+                this.isLoading = false
+
+                const params = {
+                    ...this.form,
+                    page,
+                }
+
+                const { data } = await axios.get('/student', { params })
+
+                this.students = data
+
+                this.isLoading = true
+            },
+
+            handleEdit(index, row) {
+                window.location.replace(`/students/${row.id}`)
+            },
+
+            async handleDelete(index, row) {
+                try {
+                    const form = new FormData()
+
+                    form.append('id', row.id)
+
+                    const { data } = await axios.post('/student/delete/', form)
+
+                    this.getData(this.students.page)
+                } catch (error) {
+                    console.error(error);
+                    this.$message.error(error.message);                    
+                }
+            },
+        },
+    })
 </script>
 {% endblock scripts %}

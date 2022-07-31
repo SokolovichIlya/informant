@@ -7,131 +7,173 @@
 {% endblock breadcrumbs %}
 
 {% block main %}
-<div class="wrapper-content">
+<div class="wrapper-content" id="app">
     <div class="page">
         <div class="page-body page-block">
-            <form enctype="multipart/form-data" action="/student/" method="POST" class="form">
-                {% csrf_token %}
-                <input type="hidden" name="id" value="{{ student.id }}">
-                <div class="form-group">
-                    <label for="id_fio">ФИО:</label>
-                    <input type="text" name="fio" maxlength="150" required="" id="id_fio" value="{{ student.fio }}">
-                </div>
-                <div class="form-group">
-                    <label for="id_participation_period">Период участия:</label>
-                    <input type="text" name="participation_period" maxlength="250" required="" id="id_participation_period" value="{{ student.participation_period }}">
-                </div>
-                <div class="form-group">
-                    <label for="id_mounth">Месяц:</label>
-                    <select name="mounth" id="id_mounth">
-                        <option value="0">Январь</option>
-                        <option value="1">Февраль</option>
-                        <option value="2">Март</option>
-                        <option value="3">Апрель</option>
-                        <option value="4">Май</option>
-                        <option value="5">Июнь</option>
-                        <option value="6">Июль</option>
-                        <option value="7">Август</option>
-                        <option value="8">Сентябрь</option>
-                        <option value="9">Октябрь</option>
-                        <option value="10">Ноябрь</option>
-                        <option value="11">Декабрь</option>
-                    </select>   
-                </div>
-                <div class="form-group">
-                    <label for="id_level">Уровень:</label>
-                    <select name="level" id="id_level">
-                        <option value="0">Муниципальный</option>
-                        <option value="1">Региональный</option>
-                        <option value="2">Федеральный</option>
-                    </select>    
-                </div>  
-                <div class="form-group">
-                    <label for="id_category">Категория:</label>
-                    <select name="category" id="id_category">
-                        <option value="" selected="">---------</option>
-                        {% for category in categories %}
-                        <optgroup label="{{ category.name }}">
-                            {% for subCategory in subCategories %}
-                                {% if subCategory.category == category %}
-                                    {% if subCategory == student.sub_category %}
-                                    <option selected>{{ subCategory.name }}</option>
-                                    {% else %}
-                                    <option >{{ subCategory.name }}</option>
-                                    {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                    </select>   
-                </div>  
-                <div class="form-group">
-                    <label for="id_document">Подтверждающий документ: </label>
-                    <input type="file" name="document" id="id_document" value="http://127.0.0.1:8000/media/{{ student.document }}">
-
-                    <a class="margin-top" href="/media/{{ student.document }}">Указанный документ</a>
-                </div>                
-                <div class="form-group">
-                    <label for="id_teacher">Учитель-наставник:</label>
-                    <select name="teacher" id="id_teacher">
-                        <option value="" selected="">---------</option>
-                        {% for teacher in teachers %}
-                            {% if teacher == student.teacher %}
-                                <option value="{{ teacher.id }}" selected>{{ teacher.last_name }} {{ teacher.first_name }}</option>
-                            {% else %}
-                                <option value="{{ teacher.id }}">{{ teacher.last_name }} {{ teacher.first_name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select> 
-                </div>  
-                <div class="form-group">
-                    <label for="id_result">Результат:</label>
-                    <select name="result" id="id_result">
-                        <option value="0">Победитель</option>
-                        <option value="1">Призер</option>
-                        <option value="2">Участник</option>
-                    </select> 
-                </div>                
-                <div class="form-group">
-                    <label for="id_participation_in_profile_shifts">Участие в профильных сменах:</label>
-                    <select name="participation_in_profile_shifts" id="id_participation_in_profile_shifts">
-                        <option value="" selected="">---------</option>
-                        {% for profile in profileShifts %}
-                            {% if profile == student.participation_in_profile_shifts  %}
-                                <option value="{{ profile.id }}" selected>{{ profile.name }}</option>
-                            {% else %}
-                                <option value="{{ profile.id }}">{{ profile.name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>   
-                </div>             
-                <div class="form-group">
-                    <label for="id_name_program">Название программы:</label>
-                    <input type="text" name="name_program" maxlength="1000" required="" id="id_name_program" value="{{ student.name_program }}">
-                </div>
-                <button class="button">Сохранить</button>
-                <a href="/students" class="button">Назад</a>
-            </form>
+            <el-form :model="student" :rules="rules" label-position="left" ref="student" label-width="300px">
+                <el-form-item label="ФИО" prop="fio">
+                    <el-input v-model="student.fio" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Период участия" prop="participation_period">
+                    <el-input v-model="student.participation_period" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item label="Месяц участия" prop="mounth">
+                    <el-select class="w-100" v-model="student.mounth" placeholder="">
+                        <el-option v-for="(item, index) in mounthList" :key="`m-${index}`" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Уровень" prop="level">
+                    <el-select class="w-100" v-model="student.level" placeholder="">
+                        <el-option v-for="item in levelList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Категория" prop="category">
+                    <el-select class="w-100" v-model="student.category" placeholder="">
+                        <el-option v-for="item in categories" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Подкатегория" prop="sub_category">
+                    <el-select class="w-100" v-model="student.sub_category" placeholder="">
+                        <el-option v-for="item in subCategories" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Подтверждающий документ" prop="document">
+                    <el-link :href="`/media/${student.document_link}`" target="_blank">Подтверждающий документ</el-link>
+                </el-form-item>
+                <el-form-item label="Учитель-наставник" prop="teacher">
+                    <el-select class="w-100" v-model="student.teacher" placeholder="">
+                        <el-option v-for="item in teachers" :label="`${item.last_name} ${item.first_name}`" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Результат" prop="result">
+                    <el-select class="w-100" v-model="student.result" placeholder="">
+                        <el-option v-for="item in resultList" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Участие в профильных сменах" prop="participation_in_profile_shifts">
+                    <el-select class="w-100" v-model="student.participation_in_profile_shifts" placeholder="">
+                        <el-option v-for="item in profileShifts" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Название программы" prop="name_program">
+                    <el-input v-model="student.name_program" placeholder=""></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('student')">Сохранить</el-button>
+                    <el-button @click="resetForm('student')">Сбросить</el-button>
+                    <el-button @click="backList()">Назад</el-button>
+                </el-form-item>
+            </el-form>
         </div>
     </div>
 </div>
 {% endblock main %}
 
 {% block scripts %}
+<script src="{% static 'js/config.js' %}"></script>
+<script src="{% static 'js/csrftoken.js' %}"></script>
 <script>
-$('#id_mounth').val('{{ student.mounth }}')
-$('#id_level').val('{{ student.level }}')
-$('#id_result').val('{{ student.result }}')
 
-const fileInput = document.querySelector('#id_document');
+    const djangoStudent = JSON.parse('{{ student | safe }}')[0]
 
-const myFile = new File(['Файл'], '/media/{{ student.document }}', {
-    type: 'text/plain',
-    lastModified: new Date(),
-});
+    const teachers = JSON.parse('{{ teachers | safe }}')
+    const subCategories = JSON.parse('{{ subCategories | safe }}')
+    const categories = JSON.parse('{{ categories | safe }}')
+    const profileShifts = JSON.parse('{{ profileShifts | safe }}')
 
-const dataTransfer = new DataTransfer();
-dataTransfer.items.add(myFile);
-fileInput.files = dataTransfer.files;
+    new Vue({
+        el: '#app',
+
+        delimiters: ['[[', ']]'],
+
+        data: () => ({
+            isLoading: false,
+
+            student: setupStudent(djangoStudent),
+
+            rules: {
+                fio: [
+                    { required: true, message: 'Пожалуйста, укажите ФИО', trigger: 'blur' }
+                ],
+                participation_period: [
+                    { required: true, message: 'Пожалуйста, укажите Период участия', trigger: 'blur' }
+                ],
+                mounth: [
+                    { required: true, message: 'Пожалуйста, выберите Месяц', trigger: 'change' }
+                ],
+                level: [
+                    { required: true, message: 'Пожалуйста, выберите Уровень', trigger: 'change' }
+                ],
+                category: [
+                    { required: true, message: 'Пожалуйста, выберите Категорию', trigger: 'change' }
+                ],
+                sub_category: [
+                    { required: true, message: 'Пожалуйста, выберите Подкатегорию', trigger: 'change' }
+                ],
+                document: [
+                    { required: false, message: 'Пожалуйста, прикрепите Документ', trigger: 'change' }
+                ],
+                teacher: [
+                    { required: true, message: 'Пожалуйста, укажите Учителя-наставника', trigger: 'blur' }
+                ],
+                result: [
+                    { required: true, message: 'Пожалуйста, выберите Результат', trigger: 'change' }
+                ],
+                participation_in_profile_shifts: [
+                    { required: true, message: 'Пожалуйста, выберите Участие в профильных сменах', trigger: 'change' }
+                ],
+                name_program: [
+                    { required: true, message: 'Пожалуйста, укажите Название программы', trigger: 'blur' }
+                ],
+            },
+
+            mounthList,
+            levelList,
+            resultList,
+            teachers,
+            subCategories,
+            categories,
+            profileShifts,
+        }),
+
+        methods: {
+            async submitForm(formName) {
+                await this.$refs[formName].validate(async (valid) => {
+                    if (valid) {
+                        let form = new FormData()
+
+                        for ( var key in this.student ) {
+                            form.append(key, this.student[key]);
+                        }
+
+                        try {
+                            const { data } = await axios.post('/student/update/', form, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
+
+                            this.backList()
+
+                        } catch (error) {
+                            console.error(error);
+                            this.$message.error(error.message);
+                        }
+
+                    } else {
+                        return false;
+                    }
+                });
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            backList() {
+                window.location.replace('/students/')
+            },
+        },
+    })
 </script>
 {% endblock scripts %}

@@ -1,4 +1,5 @@
 import imp
+import re
 from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate
@@ -36,16 +37,16 @@ class StudentAddPageView(TemplateView):
     template_name = "pages/students/add.html"
 
     def get_context_data(self, **kwargs):
-        teachers = User.objects.all()
-        categories = Categories.objects.all()
-        subCategories = SubCategories.objects.all()
-        profileShifts = ProfileShifts.objects.all()
+        teachers = User.objects.all().values()
+        categories = Categories.objects.all().values()
+        subCategories = SubCategories.objects.all().values()
+        profileShifts = ProfileShifts.objects.all().values()
 
         context = {
-            'teachers': teachers,
-            'categories': categories,
-            'subCategories': subCategories,
-            'profileShifts': profileShifts,
+            'categories': json.dumps(list(categories), default=customDateSerialize),
+            'subCategories': json.dumps(list(subCategories), default=customDateSerialize),
+            'teachers': json.dumps(list(teachers), default=customDateSerialize),
+            'profileShifts': json.dumps(list(profileShifts), default=customDateSerialize),
         }
 
         return context
@@ -54,16 +55,16 @@ class TeacherAddPageView(TemplateView):
     template_name = "pages/teachers/add.html"
 
     def get_context_data(self, **kwargs):
-        categories = Categories.objects.all()
-        subCategories = SubCategories.objects.all()
-        kpk = Kpk.objects.filter(default_view = True)
-        publications = Publications.objects.all()
+        categories = Categories.objects.all().values()
+        subCategories = SubCategories.objects.all().values()
+        kpk = Kpk.objects.filter(default_view = True).values()
+        publications = Publications.objects.all().values()
 
         context = {
-            'kpk': kpk,
-            'categories': categories,
-            'subCategories': subCategories,
-            'publications': publications,
+            'categories': json.dumps(list(categories), default=customDateSerialize),
+            'subCategories': json.dumps(list(subCategories), default=customDateSerialize),
+            'kpk': json.dumps(list(kpk), default=customDateSerialize),
+            'publications': json.dumps(list(publications), default=customDateSerialize),
         }
 
         return context
@@ -104,15 +105,12 @@ class Student(View):
     def post(self, request):
         try:
             if request.user.is_authenticated:
-                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
-                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
-
                 fio = request.POST.get('fio')
                 participation_period = request.POST.get('participation_period')
                 mounth = request.POST.get('mounth')
                 level  = request.POST.get('level')
-                category  = Categories.objects.get(pk=id_category)
-                sub_category  = SubCategories.objects.get(pk=id_sub_category)
+                category  = Categories.objects.get(pk=request.POST.get('category'))
+                sub_category  = SubCategories.objects.get(pk=request.POST.get('sub_category'))
                 document = request.FILES['document']
                 teacher  = User.objects.get(pk=request.POST.get('teacher'))
                 result  = request.POST.get('result')
@@ -129,68 +127,65 @@ class Student(View):
 
         except Exception as e:
             print(e)
-            return HttpResponse(status=401)
+            return HttpResponse(status=500)
 
-    def put(self, request):
+    def update(request):
         try:
             if request.user.is_authenticated:
-                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
-                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
-
-                student_id = request.POST.get('student_id')
-
+                student_id = request.POST.get('id')
                 fio = request.POST.get('fio')
                 participation_period = request.POST.get('participation_period')
                 mounth = request.POST.get('mounth')
                 level  = request.POST.get('level')
-                category  = Categories.objects.get(pk=id_category)
-                sub_category  = SubCategories.objects.get(pk=id_sub_category)
-                document = request.FILES['document']
+                category  = Categories.objects.get(id=request.POST.get('category'))
+                sub_category  = SubCategories.objects.get(id=request.POST.get('sub_category'))
                 teacher  = User.objects.get(pk=request.POST.get('teacher'))
                 result  = request.POST.get('result')
-                participation_in_profile_shifts = ProfileShifts.objects.get(pk=request.POST.get('participation_in_profile_shifts'))
+                participation_in_profile_shifts = ProfileShifts.objects.get(id=request.POST.get('participation_in_profile_shifts'))
                 name_program = request.POST.get('name_program')
 
 
             Students.objects.filter(id=student_id).update(fio=fio, participation_period=participation_period, 
                                                             mounth=mounth, level=level, category=category, 
-                                                            sub_category=sub_category,
-                                                            document=document, teacher=teacher,  result=result,
+                                                            sub_category=sub_category, teacher=teacher,  result=result,
                                                             participation_in_profile_shifts=participation_in_profile_shifts,
                                                             name_program=name_program)
 
             return redirect('/students/')
         
         except Exception as e:
-            return response(e)
+            print(e)
+            return HttpResponse(status=500)
 
-    def delete(self, request):
+    def delete(request):
         try:
-            student_id = request.POST.get('student_id')
+            student_id = request.POST.get('id')
 
             student = Students.objects.get(id=student_id)
+
             student.delete()
 
-            return HttpResponse(status_code=200)
+            return HttpResponse(status=200)
         
         except Exception as e:
-            return response(e)
+            print(e)
+            return HttpResponse(status=500)
 
 
 class StudentDetail(View):
     def get(self, request, id):
-        student = Students.objects.get(id = id)
-        teachers = User.objects.all()
-        categories = Categories.objects.all()
-        subCategories = SubCategories.objects.all()
-        profileShifts = ProfileShifts.objects.all()
+        student = Students.objects.filter(id = id).values()
+        teachers = User.objects.all().values()
+        categories = Categories.objects.all().values()
+        subCategories = SubCategories.objects.all().values()
+        profileShifts = ProfileShifts.objects.all().values()
 
         context = {
-            'teachers': teachers,
-            'categories': categories,
-            'subCategories': subCategories,
-            'profileShifts': profileShifts,
-            'student': student,
+            'teachers': json.dumps(list(teachers), default=customDateSerialize),
+            'categories': json.dumps(list(categories), default=customDateSerialize),
+            'subCategories': json.dumps(list(subCategories), default=customDateSerialize),
+            'profileShifts': json.dumps(list(profileShifts), default=customDateSerialize),
+            'student': json.dumps(list(student)),
         }
 
 
@@ -204,8 +199,10 @@ class Teacher(View):
             page = request.GET.get('page')
             per_page = 10 # лимит отображения на странице
             
-
-            data = Teachers.objects.filter(fio=fio).values()
+            if fio:
+                data = Teachers.objects.filter(fio=fio).values()
+            else:
+                data = Teachers.objects.all().values()
 
             total = data.count()
 
@@ -216,7 +213,7 @@ class Teacher(View):
                 total_page = total / per_page
             
             teachers = {
-                'data':data,
+                'data': list(data),
                 'total': total,
                 'per_page': per_page,
                 'page': page,
@@ -254,15 +251,12 @@ class Teacher(View):
         except Exception as e:
             return response(e)
 
-    def put(self, request):
+    def update(request):
         try:
-
-
             if request.user.is_authenticated:
                 id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
                 
                 teacher_id = request.POST.get('student_id')
-
 
                 fio = request.POST.get('fio')
                 participation_period = request.POST.get('participation_period')
@@ -284,9 +278,9 @@ class Teacher(View):
         except Exception as e:
             return response(e)
 
-    def delete(self, request):
+    def delete(request):
         try:
-            teacher_id = request.POST.get('teacher_id')
+            teacher_id = request.POST.get('id')
 
             teacher = Teachers.objects.get(id=teacher_id)
             teacher.delete()
@@ -295,6 +289,25 @@ class Teacher(View):
         
         except Exception as e:
             return response(e)
+
+
+class TeacherDetail(View):
+    def get(self, request, id):
+        teacher = Teachers.objects.filter(id = id).values()
+        categories = Categories.objects.all().values()
+        subCategories = SubCategories.objects.all().values()
+        kpk = Kpk.objects.filter(default_view = True).values()
+        publications = Publications.objects.all().values()
+
+        context = {
+            'teacher': json.dumps(list(teacher), default=customDateSerialize),
+            'categories': json.dumps(list(categories), default=customDateSerialize),
+            'subCategories': json.dumps(list(subCategories), default=customDateSerialize),
+            'kpk': json.dumps(list(kpk), default=customDateSerialize),
+            'publications': json.dumps(list(publications), default=customDateSerialize),
+        }
+
+        return render(request, 'pages/students/detail.html', context) 
 
 
 def login(request):
