@@ -20,6 +20,8 @@ urlpatterns = [
     path('student/', Student.as_view(), name='student'),
     path('teacher/', Teacher.as_view(), name='teacher'),
 
+    path('kpk/', Kpk.as_view(), name='kpk'),
+
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),
 ] 
