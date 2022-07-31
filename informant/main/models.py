@@ -43,7 +43,6 @@ class Kpk(models.Model):
     organization = models.CharField("Организация в соответствии с удостоверением", max_length=1000,  blank=True, null = True)
     date_issue = models.DateField("Дата выдачи", max_length=1000,  blank=True, null = True)
     number_hours = models.IntegerField("Количество часов",  blank=True, null = True)
-    document = models.FileField(upload_to='kpk/', blank=True, null = True)
     default_view = models.BooleanField("Показывать по умолчанию", default=False) 
 
     def __str__(self):
@@ -97,10 +96,14 @@ class Teachers(models.Model):
     mounth = models.CharField("Месяц", max_length=2, default='0', choices=Mounth())
     level  = models.CharField("Уровень", max_length=1, default='0', choices=Level())
     category  = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
-    document = models.FileField(upload_to='documents/')
+    sub_category  = models.ForeignKey(SubCategories, on_delete=models.SET_NULL, null=True, blank=True) 
+    category_document = models.FileField(upload_to='documents/')
     result  = models.CharField("Результат", max_length=1, default='2', choices=Result())
-    kpk  = models.ForeignKey(Kpk, on_delete=models.SET_NULL, null=True, blank=True)
+    kpk = models.ForeignKey(Kpk, on_delete=models.SET_NULL, null=True, blank=True)
+    kpk_document = models.FileField(upload_to='documents/')
     publications  = models.ForeignKey(Publications, on_delete=models.SET_NULL, null=True, blank=True)
+    publications_document = models.FileField(upload_to='documents/')
+
 
     class Meta:
         verbose_name = 'Данные об учителе'

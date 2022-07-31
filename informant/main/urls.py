@@ -22,7 +22,9 @@ urlpatterns = [
     path('export_teaches/', ExportToExcel.exportToExcelTeachers, name='export_teaches'),
 
     path('download_file_students/', DownloadFile.downloadFileStudents, name='download_file_students'),
-    path('download_file_teaches/', DownloadFile.downloadFileTeachers, name='download_file_teaches'),
+    path('download_file_teachesr/', DownloadFile.downloadFileTeachers, name='download_file_teachesr'),
+
+    path('kpk/', KpkView.as_view(), name='kpk'),
 
     path('login/', login, name='login'),
     path('logout/', logout, name='logout'),

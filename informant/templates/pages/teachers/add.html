@@ -131,7 +131,14 @@
                 <el-input v-model="kpkForm.kpk_organization" placeholder=""></el-input>
             </el-form-item>
             <el-form-item label="Дата выдачи в форматие ДД.ММ.ГГ" prop="kpk_date_issue">
-                <el-input v-model="kpkForm.kpk_date_issue" placeholder=""></el-input>
+                <el-date-picker
+                    v-model="kpkForm.kpk_date_issue"
+                    type="date"
+                    placeholder=""
+                    format="dd.MM.yyyy"
+                    class="w-100"
+                >
+                </el-date-picker>
             </el-form-item>
             <el-form-item label="Количество часов" prop="kpk_number_hours">
                 <el-input v-model="kpkForm.kpk_number_hours" placeholder=""></el-input>
@@ -139,7 +146,7 @@
         </el-form>
         <span slot="footer" class="dialog-footer">
             <el-button @click="cancelCreateKPK">Отмена</el-button>
-            <el-button type="primary" @click="dialogVisible = false">Сохранить</el-button>
+            <el-button type="primary" @click="createKPK('kpkForm')">Сохранить</el-button>
         </span>
     </el-dialog>
 
@@ -186,7 +193,7 @@
                 kpk_name: '',
                 kpk_city: '',
                 kpk_organization: '',
-                kpk_date_issue: '',
+                kpk_date_issue: new Date(),
                 kpk_number_hours: '',
             },
 
@@ -249,7 +256,7 @@
                     { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
                 ],
                 kpk_date_issue: [
-                    { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
+                    { type: 'date', required: true, message: 'Пожалуйста, заполните поле', trigger: 'change' }
                 ],
                 kpk_number_hours: [
                     { required: true, message: 'Пожалуйста, заполните поле', trigger: 'blur' }
@@ -337,7 +344,31 @@
             async createKPK(formName) {
                 await this.$refs[formName].validate(async (valid) => {
                     if (valid) {
-                        
+                        let form = new FormData()
+
+                        for ( var key in this.kpkForm ) {
+
+                            if (key === 'kpk_date_issue') {
+                                form.append(key, moment(this.kpkForm[key]).format('YYYY-MM-DD'))
+                            } else {
+                                form.append(key, this.kpkForm[key])
+                            }
+                        }
+
+                        try {
+                            const { data } = await axios.post('/kpk/', form)
+
+                            const newKpk = JSON.parse(data)[0]
+
+                            this.kpkList.push(newKpk)
+
+                            this.teacher.kpk = newKpk.id
+
+                            this.dialogVisible = false
+                        } catch (error) {
+                            console.error(error)
+                            this.$message.error(error.message)
+                        }
                     }
                 })
             },
@@ -347,7 +378,7 @@
                     kpk_name: '',
                     kpk_city: '',
                     kpk_organization: '',
-                    kpk_date_issue: '',
+                    kpk_date_issue: new Date(),
                     kpk_number_hours: '',
                 }
 
