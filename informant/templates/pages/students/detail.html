@@ -14,13 +14,30 @@
                 <el-form-item label="ФИО" prop="fio">
                     <el-input v-model="student.fio" placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="Период участия" prop="participation_period">
-                    <el-input v-model="student.participation_period" placeholder=""></el-input>
-                </el-form-item>
-                <el-form-item label="Месяц участия" prop="mounth">
-                    <el-select class="w-100" v-model="student.mounth" placeholder="">
-                        <el-option v-for="(item, index) in mounthList" :key="`m-${index}`" :label="item.label" :value="item.value"></el-option>
-                    </el-select>
+                <el-form-item required label="Период участия с/по">
+                    <el-col :span="7">
+                        <el-form-item prop="date_from">
+                            <el-date-picker
+                                v-model="student.date_from"
+                                type="date"
+                                placeholder=""
+                                format="dd.MM.yyyy"
+                            >
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                    <el-col class="line" :span="1">-</el-col>
+                    <el-col :span="7">
+                        <el-form-item prop="date_to">
+                            <el-date-picker
+                                v-model="student.date_to"
+                                type="date"
+                                placeholder=""
+                                format="dd.MM.yyyy"
+                            >
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
                 </el-form-item>
                 <el-form-item label="Уровень" prop="level">
                     <el-select class="w-100" v-model="student.level" placeholder="">
@@ -142,7 +159,11 @@
                         let form = new FormData()
 
                         for ( var key in this.student ) {
-                            form.append(key, this.student[key]);
+                            if (key === 'date_from' || key === 'date_to') {
+                                form.append(key, moment(this.student[key]).format('YYYY-MM-DD'))
+                            } else {
+                                form.append(key, this.student[key])
+                            }
                         }
 
                         try {

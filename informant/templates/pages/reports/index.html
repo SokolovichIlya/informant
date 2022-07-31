@@ -85,7 +85,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="submitForm('student')">Сформировать</el-button>
+                        <el-button type="primary" @click="submitForm()">Сформировать</el-button>
                         <el-button @click="backList()">Сбросить</el-button>
                     </el-form-item>
                 </el-form>
@@ -163,7 +163,59 @@
         },
 
         methods: {
+            async submitForm() {
+                if (this.form.type === "0") {
+                    await this.exportStudents()
+                } else {
+                    await this.exportTeachers()
+                }
+            },
 
+            async exportStudents() {
+                const params = {
+                    date_from: moment(this.form.date_from).format('YYYY-MM-DD'),
+                    date_to: moment(this.form.date_to).format('YYYY-MM-DD') ,
+                    category: this.form.category,
+                    result: this.form.result,
+                }
+
+                const { data, headers } = await axios.get('/export_students', { params, responseType: 'blob', })
+
+                let link = document.createElement('a')
+
+                link.download = 'eeee.xls'
+
+                link.href = URL.createObjectURL(new Blob([data], { type: headers['content-type'] }))
+
+                link.click()
+
+                URL.revokeObjectURL(link.href)
+            },
+
+            async exportTeachers() {
+                const params = {
+                    date_from: moment(this.form.date_from).format('YYYY-MM-DD'),
+                    date_to: moment(this.form.date_to).format('YYYY-MM-DD') ,
+                    category: this.form.category,
+                    kpk: this.form.kpk,
+                    fio: this.form.teacher,
+                    result: this.form.result,
+                    student_category: this.form.student_category,
+                    student_result: this.form.student_result,
+                }
+
+                const { data } = await axios.get('/export_teachers', { params })
+
+                let link = document.createElement('a')
+
+                link.download = 'eeee.xls'
+
+                link.href = URL.createObjectURL(new Blob([data], { type: headers['content-type'] }))
+
+                link.click()
+
+                URL.revokeObjectURL(link.href)
+            },
         },
     })
 </script>

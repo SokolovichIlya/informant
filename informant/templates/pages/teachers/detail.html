@@ -14,13 +14,30 @@
                 <el-form-item label="ФИО" prop="fio">
                     <el-input v-model="teacher.fio" placeholder=""></el-input>
                 </el-form-item>
-                <el-form-item label="Период участия" prop="participation_period">
-                    <el-input v-model="teacher.participation_period" placeholder=""></el-input>
-                </el-form-item>
-                <el-form-item label="Месяц участия" prop="mounth">
-                    <el-select class="w-100" v-model="teacher.mounth" placeholder="">
-                        <el-option v-for="item in mounthList" :label="item.label" :value="item.value"></el-option>
-                    </el-select>
+                <el-form-item required label="Период участия с/по">
+                    <el-col :span="7">
+                        <el-form-item >
+                            <el-date-picker
+                                v-model="teacher.date_from"
+                                type="date"
+                                placeholder=""
+                                format="dd.MM.yyyy"
+                            >
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                    <el-col class="line" :span="1">-</el-col>
+                    <el-col :span="7">
+                        <el-form-item >
+                            <el-date-picker
+                                v-model="teacher.date_to"
+                                type="date"
+                                placeholder=""
+                                format="dd.MM.yyyy"
+                            >
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
                 </el-form-item>
                 <el-form-item label="Уровень" prop="level">
                     <el-select class="w-100" v-model="teacher.level" placeholder="">
@@ -204,11 +221,11 @@
                 fio: [
                     { required: true, message: 'Пожалуйста, укажите ФИО', trigger: 'blur' }
                 ],
-                participation_period: [
-                    { required: true, message: 'Пожалуйста, укажите Период участия', trigger: 'blur' }
+                date_from: [
+                    { type: 'date', required: true, message: 'Пожалуйста, укажите Период участия', trigger: 'change' }
                 ],
-                mounth: [
-                    { required: true, message: 'Пожалуйста, выберите Месяц', trigger: 'change' }
+                date_to: [
+                    { type: 'date', required: true, message: 'Пожалуйста, укажите Период участия', trigger: 'change' }
                 ],
                 level: [
                     { required: true, message: 'Пожалуйста, выберите Уровень', trigger: 'change' }
@@ -298,7 +315,11 @@
                         let form = new FormData()
 
                         for ( var key in this.teacher ) {
-                            form.append(key, this.teacher[key]);
+                            if (key === 'date_from' || key === 'date_to') {
+                                form.append(key, moment(this.teacher[key]).format('YYYY-MM-DD'))
+                            } else {
+                                form.append(key, this.teacher[key])
+                            }
                         }
 
                         try {

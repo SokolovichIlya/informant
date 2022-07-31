@@ -2,8 +2,8 @@ function setupStudent(data) {
     return {
         id: data.id,
         fio: data.fio,
-        participation_period: data.participation_period,
-        mounth: data.mounth,
+        date_from: data.date_from,
+        date_to: data.date_to,
         level: data.level,
         category: data.category_id,
         sub_category: data.sub_category_id,
@@ -19,8 +19,8 @@ function setupTeacher(data) {
     return {
         id: data.id,
         fio: data.fio,
-        participation_period: data.participation_period,
-        mounth: data.mounth,
+        date_from: new Date(data.date_from),
+        date_to: new Date(data.date_to),
         level: data.level,
         category: data.category,
         sub_category: data.sub_category,

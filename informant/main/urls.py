@@ -19,10 +19,10 @@ urlpatterns = [
     path('student/delete/', Student.delete, name='student_delete'),
 
     path('export_students/', ExportToExcel.exportToExcelStudents, name='export_students'),
-    path('export_teaches/', ExportToExcel.exportToExcelTeachers, name='export_teaches'),
+    path('export_teachers/', ExportToExcel.exportToExcelTeachers, name='export_teachers'),
 
     path('download_file_students/', DownloadFile.downloadFileStudents, name='download_file_students'),
-    path('download_file_teachesr/', DownloadFile.downloadFileTeachers, name='download_file_teachesr'),
+    path('download_file_teachers/', DownloadFile.downloadFileTeachers, name='download_file_teachers'),
 
     path('kpk/', KpkView.as_view(), name='kpk'),
     path('kpk/update/', KpkView.update, name='kpk_update'),

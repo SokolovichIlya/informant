@@ -46,7 +46,7 @@ class StudentAddPageView(TemplateView):
             'categories': json.dumps(list(categories), default=customDateSerialize),
             'subCategories': json.dumps(list(subCategories), default=customDateSerialize),
             'teachers': json.dumps(list(teachers), default=customDateSerialize),
-            'profileShifts': json.dumps(list(profileShifts), default=customDateSerialize),
+            'profileShifts': json.dumps(list(profileShifts)),
         }
 
         return context
@@ -119,8 +119,8 @@ class Student(View):
         try:
             if request.user.is_authenticated:
                 fio = request.POST.get('fio')
-                date_from = request.GET.get('date_from') 
-                date_to = request.GET.get('date_to') 
+                date_from = request.POST.get('date_from') 
+                date_to = request.POST.get('date_to') 
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(pk=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(pk=request.POST.get('sub_category'))
@@ -147,8 +147,8 @@ class Student(View):
             if request.user.is_authenticated:
                 student_id = request.POST.get('id')
                 fio = request.POST.get('fio')
-                date_from = request.GET.get('date_from') 
-                date_to = request.GET.get('date_to')
+                date_from = request.POST.get('date_from') 
+                date_to = request.POST.get('date_to')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(id=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(id=request.POST.get('sub_category'))
@@ -198,7 +198,7 @@ class StudentDetail(View):
             'categories': json.dumps(list(categories), default=customDateSerialize),
             'subCategories': json.dumps(list(subCategories), default=customDateSerialize),
             'profileShifts': json.dumps(list(profileShifts), default=customDateSerialize),
-            'student': json.dumps(list(student)),
+            'student': json.dumps(list(student), default=customDateSerialize),
         }
 
 
@@ -252,8 +252,8 @@ class Teacher(View):
                                     page_range=publications_page_range)
 
                 fio = request.POST.get('fio')
-                date_from = request.GET.get('date_from') 
-                date_to = request.GET.get('date_to')
+                date_from = request.POST.get('date_from') 
+                date_to = request.POST.get('date_to')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(pk=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(pk=request.POST.get('sub_category'))
@@ -292,8 +292,8 @@ class Teacher(View):
                                     page_range=publications_page_range)
 
                 fio = request.POST.get('fio')
-                date_from = request.GET.get('date_from') 
-                date_to = request.GET.get('date_to')
+                date_from = request.POST.get('date_from') 
+                date_to = request.POST.get('date_to')
                 level  = request.POST.get('level')
                 category  = Categories.objects.get(id=request.POST.get('category'))
                 sub_category  = SubCategories.objects.get(id=request.POST.get('sub_category'))
@@ -362,8 +362,8 @@ class TeacherDetail(View):
         teacher = Teachers.objects.filter(id = id).values(
             'id',
             'fio',
-            'participation_period',
-            'mounth',
+            'date_from',
+            'date_to',
             'level',
             'category',
             'sub_category',
@@ -471,12 +471,9 @@ class ExportToExcel(View):
 
 
 
-        rows = Students.objects.filter(**filters).values_list('fio', 'participation_period', 'mounth',
+        rows = Students.objects.filter(**filters).values_list('fio', 'date_from', 'date_to',
                                         'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
                                         'name_program').order_by(Lower('fio'))
-
-
-        
 
 
         for row in rows:
