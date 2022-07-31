@@ -228,10 +228,6 @@ class Teacher(View):
     def post(self, request):
         try:
             if request.user.is_authenticated:
-                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
-                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
-                
-                kpk_id  = request.POST.get('kpk')
                 publications_name = request.POST.get('publications_name')
                 publications_name_journal = request.POST.get('publications_name_journal')
                 publications_city = request.POST.get('publications_city')
@@ -247,11 +243,11 @@ class Teacher(View):
                 participation_period = request.POST.get('participation_period')
                 mounth = request.POST.get('mounth')
                 level  = request.POST.get('level')
-                category  = Categories.objects.get(pk=id_category)
-                sub_category  = SubCategories.objects.get(pk=id_sub_category)
+                category  = Categories.objects.get(pk=request.POST.get('category'))
+                sub_category  = SubCategories.objects.get(pk=request.POST.get('sub_category'))
                 category_document = request.FILES['category_document']
                 result  = request.POST.get('result')
-                kpk = Kpk.objects.get(pk=kpk_id)
+                kpk = Kpk.objects.get(pk=request.POST.get('kpk'))
                 kpk_document = request.FILES['kpk_document']
                 publications  = Publications.objects.get(pk=publications_id.pk)
                 publications_document = request.FILES['publications_document']
@@ -271,23 +267,8 @@ class Teacher(View):
     def update(request):
         try:
             if request.user.is_authenticated:
-                teacher_id = request.POST.get('student_id')
-
-                id_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('category').first()[0]
-                id_sub_category = SubCategories.objects.filter(name=request.POST.get('category')).values_list('pk').first()[0]
-                
-                kpk_id  = request.POST.get('kpk')
-                if kpk_id == None:
-                    kpk_name = request.POST.get('kpk_name')
-                    kpk_city = request.POST.get('kpk_city')
-                    kpk_organization = request.POST.get('kpk_organization')
-                    kpk_date_issue = request.POST.get('kpk_date_issue')
-                    kpk_number_hours = request.POST.get('kpk_number_hours')
-
-                    kpk_id = Kpk.objects.create(kpk_name=kpk_name, kpk_city=kpk_city, kpk_organization=kpk_organization, 
-                                        kpk_date_issue=kpk_date_issue, kpk_number_hours=kpk_number_hours)
-                    kpk_id = kpk_id.pk
-
+                teacher_id = request.POST.get('teacher_id')
+      
                 publications_name = request.POST.get('publications_name')
                 publications_name_journal = request.POST.get('publications_name_journal')
                 publications_city = request.POST.get('publications_city')
@@ -302,11 +283,11 @@ class Teacher(View):
                 participation_period = request.POST.get('participation_period')
                 mounth = request.POST.get('mounth')
                 level  = request.POST.get('level')
-                category  = Categories.objects.get(pk=id_category)
-                sub_category  = SubCategories.objects.get(pk=id_sub_category)
+                category  = Categories.objects.get(id=request.POST.get('category'))
+                sub_category  = SubCategories.objects.get(id=request.POST.get('sub_category'))
                 category_document = request.FILES['category_document']
                 result  = request.POST.get('result')
-                kpk = Kpk.objects.get(pk=kpk_id)
+                kpk = Kpk.objects.get(pk=request.POST.get('kpk'))
                 kpk_document = request.FILES['kpk_document']
                 publications  = Publications.objects.get(pk=publications_id.pk)
                 publications_document = request.FILES['publications_document']
