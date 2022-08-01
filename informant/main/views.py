@@ -408,7 +408,6 @@ def login(request):
             user = authenticate(username=cd['username'], password=cd['password'])
             if user is not None:
                 if user.is_active:
-                    print(user)
                     django_login(request, user)
                     return redirect('/')
                 else:
@@ -432,12 +431,16 @@ class ExportToExcel(View):
         filters = {}
 
         date_from = request.GET.get('date_from') 
+        date_to = request.GET.get('date_to') 
+
+        date_from = request.GET.get('date_from') 
         if date_from != None:
-            filters['date_from'] = date_from
+            filters['date_from__gte'] = date_from
         
         date_to = request.GET.get('date_to') 
         if date_to != None:
-            filters['date_to'] = date_to
+            filters['date_to__lte'] = date_to
+
 
         category = request.GET.get('category') 
         if category != None:
@@ -460,7 +463,7 @@ class ExportToExcel(View):
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
 
-        columns = ['ФИО', 'Период участия', 'Месяц', 'Уровень', 'Категория', 'Учитель', 
+        columns = ['ФИО', 'Дата с', 'Дата по', 'Уровень', 'Категория', 'Учитель', 
                     'Результат', 'Участие в профильных сменах', 'Название программы']
 
         for col_num in range(len(columns)):
@@ -468,7 +471,6 @@ class ExportToExcel(View):
 
         # Sheet body, remaining rows
         font_style = xlwt.XFStyle()
-
 
 
         rows = Students.objects.filter(**filters).values_list('fio', 'date_from', 'date_to',
@@ -479,9 +481,8 @@ class ExportToExcel(View):
         for row in rows:
             row = list(row)
 
-            for mounth in Mounth():
-                if mounth[0] == row[2]:
-                    row[2] = mounth[1]
+            row[1] = row[1].strftime("%d.%m.%Y")
+            row[2] = row[2].strftime("%d.%m.%Y")
 
             for level in Level():
                 if level[0] == row[3]:
@@ -511,16 +512,17 @@ class ExportToExcel(View):
 
         fio = request.GET.get('fio') 
         if fio != None:
-            filters['fio'] = fio    
-            filters_student['teacher'] = fio    
+            filters['fio'] = Teachers.objects.get(pk=request.GET.get('fio')).fio    
+            filters_student['teacher'] = Teachers.objects.get(pk=request.GET.get('fio')).fio 
+
 
         date_from = request.GET.get('date_from') 
         if date_from != None:
-            filters['date_from'] = date_from
+            filters['date_from__gte'] = date_from
         
         date_to = request.GET.get('date_to') 
         if date_to != None:
-            filters['date_to'] = date_to
+            filters['date_to__lte'] = date_to
 
         category = request.GET.get('category') 
         kpk = request.GET.get('kpk') 
@@ -531,7 +533,7 @@ class ExportToExcel(View):
             else:
                 filters['category'] = category
         elif category != None:
-            filters['category'] = category
+            filters['category'] = 2
 
         result = request.GET.get('result') 
         if result != None: 
@@ -574,13 +576,11 @@ class ExportToExcel(View):
             rows = Students.objects.filter(**filters).values_list('fio', 'date_from', 'date_to',
                                             'level',  'category',  'teacher',  'result',  'participation_in_profile_shifts' ,
                                             'name_program').order_by(Lower('fio'))
-
             for row in rows:
                 row = list(row)
 
-                for mounth in Mounth():
-                    if mounth[0] == row[2]:
-                        row[2] = mounth[1]
+                row[1] = row[1].strftime("%d.%m.%Y")
+                row[2] = row[2].strftime("%d.%m.%Y")
 
                 for level in Level():
                     if level[0] == row[3]:
@@ -613,7 +613,7 @@ class ExportToExcel(View):
 
             rows = Teachers.objects.filter(**filters).values_list('fio', 'date_from', 'date_to',
                                             'level',  'category', 'result',  'kpk' , 'publications').order_by(Lower('fio'))
-            
+
             for row in rows:
                 row = list(row)
 
