@@ -533,7 +533,7 @@ class ExportToExcel(View):
             else:
                 filters['category'] = category
         elif category != None:
-            filters['category'] = 2
+            filters['category'] = category
 
         result = request.GET.get('result') 
         if result != None: 
