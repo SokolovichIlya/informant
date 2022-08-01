@@ -617,9 +617,8 @@ class ExportToExcel(View):
             for row in rows:
                 row = list(row)
 
-                for mounth in Mounth():
-                    if mounth[0] == row[2]:
-                        row[2] = mounth[1]
+                row[1] = row[1].strftime("%d.%m.%Y")
+                row[2] = row[2].strftime("%d.%m.%Y")
 
                 for level in Level():
                     if level[0] == row[3]:
