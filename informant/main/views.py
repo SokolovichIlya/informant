@@ -675,14 +675,13 @@ class ExportToExcel(View):
                             row[3] = level[1]
 
                     row[4] = Categories.objects.get(pk=row[4]).name
-                    row[5] = Kpk.objects.get(pk=row[4]).name
-                    row[6]= Publications.objects.get(pk=row[7]).name
+                    row[6] = Kpk.objects.get(pk=row[6]).name
+                    row[7]= Publications.objects.get(pk=row[7]).name
 
                     row_num += 1
                     for col_num in range(len(row)):
                         ws.write(row_num, col_num, row[col_num], font_style)
                 
-
             wb.save(response)
             return response
         else:
