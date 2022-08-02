@@ -27,19 +27,23 @@ def customDateSerialize(o):
         return o.__str__()
 
 class HomePageView(LoginRequiredMixin, TemplateView):
-    login_url = 'login/'
+    login_url = '/login/'
+    redirect_field_name = None
     template_name = "pages/home.html"
 
 class TeacherPageView(LoginRequiredMixin, TemplateView):
-    login_url = 'login/'
+    login_url = '/login/'
+    redirect_field_name = None
     template_name = "pages/teachers/list.html"
 
 class StudentPageView(LoginRequiredMixin, TemplateView):
-    login_url = 'login/'
+    login_url = '/login/'
+    redirect_field_name = None
     template_name = "pages/students/list.html"
 
 class StudentAddPageView(LoginRequiredMixin, TemplateView):
-    login_url = 'login/'
+    login_url = '/login/'
+    redirect_field_name = None
     template_name = "pages/students/add.html"
 
     def get_context_data(self, **kwargs):
@@ -58,7 +62,8 @@ class StudentAddPageView(LoginRequiredMixin, TemplateView):
         return context
 
 class TeacherAddPageView(LoginRequiredMixin, TemplateView):
-    login_url = 'login/'
+    login_url = '/login/'
+    redirect_field_name = None
     template_name = "pages/teachers/add.html"
 
     def get_context_data(self, **kwargs):
@@ -77,7 +82,8 @@ class TeacherAddPageView(LoginRequiredMixin, TemplateView):
         return context
 
 class ReportsPageView(LoginRequiredMixin, TemplateView):
-    login_url = 'login/'
+    login_url = '/login/'
+    redirect_field_name = None
     template_name = "pages/reports/index.html"
 
     def get_context_data(self, **kwargs):
